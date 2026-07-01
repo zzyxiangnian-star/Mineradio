@@ -1,0 +1,32 @@
+node_modules/
+dist/
+out/
+.cookies
+.cookie
+.qq-cookie
+updates/
+*.log
+
+# Build output
+dist/
+*.exe
+*.msi
+*.dmg
+*.AppImage
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Migration backups
+_ms-migration-backup-*/
+
+# AI config
+.ai-config.json
+
+# Beatmap cache
+D:\MineradioCache\
