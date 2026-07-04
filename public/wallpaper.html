@@ -6,18 +6,30 @@
   <title>Mineradio Wallpaper</title>
   <style>
     html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050608}
-    canvas{position:absolute;inset:0;width:100%;height:100%}
+    canvas,#wallpaper-video,#scene-preview{position:absolute;inset:0;width:100%;height:100%}
+    #wallpaper-video{object-fit:cover;opacity:0;transition:opacity .35s ease;background:#050608}
+    body.has-custom-video #wallpaper-video{opacity:1}
+    #scene-preview{background-size:cover;background-position:center;opacity:0;transition:opacity .35s ease;pointer-events:none}
+    body.has-custom-scene #scene-preview{opacity:1}
+    #scene-status{position:absolute;left:28px;bottom:26px;max-width:min(520px,calc(100vw - 56px));padding:9px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(5,8,10,.42);color:rgba(255,255,255,.68);font:600 12px/1.4 system-ui,sans-serif;backdrop-filter:blur(18px);opacity:0;transition:opacity .25s ease}
+    body.has-scene-status #scene-status{opacity:1}
   </style>
 </head>
 <body>
   <canvas id="wall"></canvas>
+  <div id="scene-preview"></div>
+  <div id="scene-status"></div>
+  <video id="wallpaper-video" muted loop playsinline preload="metadata"></video>
   <script>
     'use strict';
     var canvas = document.getElementById('wall');
+    var wallpaperVideo = document.getElementById('wallpaper-video');
+    var scenePreview = document.getElementById('scene-preview');
+    var sceneStatus = document.getElementById('scene-status');
     var ctx = canvas.getContext('2d', { alpha:false });
     var W = 1, H = 1, dpr = 1;
     var state = {
-      enabled:false,title:'Mineradio',artist:'',cover:'',playing:false,preset:0,opacity:1,
+      enabled:false,title:'Mineradio',artist:'',cover:'',playing:false,preset:0,opacity:1,customVideo:null,customScene:null,
       colors:{primary:'#d6f8ff',secondary:'#9cffdf',highlight:'#fff0b8',glow:'#9cffdf'}
     };
     var coverImg = null, coverSrc = '';
@@ -66,6 +78,46 @@
       state = Object.assign({}, state, next || {});
       state.colors = Object.assign({}, state.colors, next && next.colors || {});
       setCover(state.cover || '');
+      applyCustomScene(state.customScene);
+      var scenePreviewInfo = state.customScene && state.customScene.preview || {};
+      var sceneVideo = state.customScene && state.customScene.url && scenePreviewInfo.type === 'video'
+        ? { url: state.customScene.url }
+        : null;
+      applyCustomVideo(state.customVideo || sceneVideo);
+    }
+    function applyCustomScene(customScene){
+      var url = customScene && customScene.url || '';
+      var preview = customScene && customScene.preview || {};
+      var type = preview.type || customScene && customScene.type || '';
+      document.body.classList.toggle('has-custom-scene', !!url && type !== 'video');
+      if (scenePreview) {
+        scenePreview.style.backgroundImage = url && type !== 'video' ? 'url("' + String(url).replace(/"/g, '%22') + '")' : '';
+      }
+      if (sceneStatus) {
+        var msg = customScene && customScene.message || '';
+        sceneStatus.textContent = msg;
+        document.body.classList.toggle('has-scene-status', !!msg);
+      }
+    }
+    function applyCustomVideo(customVideo){
+      var url = customVideo && customVideo.url || '';
+      if (!wallpaperVideo) return;
+      document.body.classList.toggle('has-custom-video', !!url);
+      if (!url) {
+        wallpaperVideo.pause();
+        wallpaperVideo.removeAttribute('src');
+        wallpaperVideo.load();
+        return;
+      }
+      if (wallpaperVideo.getAttribute('src') !== url) {
+        wallpaperVideo.setAttribute('src', url);
+        wallpaperVideo.load();
+      }
+      wallpaperVideo.muted = true;
+      wallpaperVideo.loop = true;
+      wallpaperVideo.playsInline = true;
+      var p = wallpaperVideo.play();
+      if (p && p.catch) p.catch(function(){ document.body.classList.remove('has-custom-video'); });
     }
     function drawCover(now){
       if (!coverImg) return;

@@ -37,11 +37,17 @@ Rules:
 10. Do not ask a question every time. Be restrained when the user wants quiet listening.
 11. For recommendation reasons, explain the musical or emotional fit briefly, like a friend choosing a song card for the current moment.
 
+Action rules:
+- When the user asks you to play a song, artist, or artist's songs, include an executable action instead of only claiming success in reply.
+- Use search_and_play for "play a song / play this artist"; use create_temp_queue for "play this artist's songs / play several songs by this artist".
+- Use add_to_queue only when the user asks to queue songs, and like_track only when the user asks to like/save the current or selected song.
+- Keep reply honest: say you will look for/play it, but do not say playback has succeeded before the app executes the action.
+
 Output:
 {
   "reply": "Natural-language reply shown to the user",
   "recommendations": [{"trackKey":"trackKey from candidateTracks","reason":"Short reason"}],
-  "actions": [{"type":"play | add_to_queue | like | create_temp_playlist | add_all_to_queue","trackKey":"Optional trackKey","label":"Button label"}]
+  "actions": [{"type":"play_track | play_search_result | search_and_play | add_to_queue | like_track | show_artist | open_artist_page | create_temp_queue","trackKey":"Optional trackKey","query":"Optional search text","artistId":"Optional artist id","artistName":"Optional artist name","limit":12,"label":"Button label"}]
 }`;
 
 function buildContextPayload(context) {

@@ -20,10 +20,15 @@ function normalizeRecommendation(item) {
 
 function normalizeAction(action) {
   const type = String(action && action.type || '').trim();
-  if (!/^(play|add_to_queue|like|create_temp_playlist|add_all_to_queue)$/.test(type)) return null;
+  if (!/^(play|play_track|play_search_result|search_and_play|add_to_queue|like|like_track|show_artist|open_artist_page|create_temp_queue|create_temp_playlist|add_all_to_queue)$/.test(type)) return null;
   return {
     type,
     trackKey: action && (action.trackKey || action.trackId) != null ? String(action.trackKey || action.trackId) : '',
+    query: String(action && action.query || '').slice(0, 160),
+    artistId: action && action.artistId != null ? String(action.artistId) : '',
+    artistName: String(action && action.artistName || '').slice(0, 120),
+    limit: Math.max(1, Math.min(80, Number(action && action.limit) || 12)),
+    song: action && action.song && typeof action.song === 'object' ? action.song : null,
     label: String(action && action.label || '').slice(0, 40),
   };
 }

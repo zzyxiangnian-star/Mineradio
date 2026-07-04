@@ -1,13 +1,13 @@
 const assert = require('assert');
 const fs = require('fs');
 
-const { parseAiResponse } = require('./lib/ai/parseAiResponse');
+const { parseAiResponse } = require('./src/lib/ai/parseAiResponse');
 const {
   normalizeCandidateTrack,
   buildCandidateList,
   validateRecommendations,
-} = require('./lib/ai/recommendation');
-const { normalizeMusicProfile } = require('./lib/ai/musicProfile');
+} = require('./src/lib/ai/recommendation');
+const { normalizeMusicProfile } = require('./src/lib/ai/musicProfile');
 const {
   normalizeBaseUrl,
   normalizeChatCompletionsUrl,
@@ -15,14 +15,14 @@ const {
   metadataFromConfig,
   resolveAiConfig,
   mergeAiConfigUpdate,
-} = require('./lib/ai/configStore');
-const { callMiMoChat } = require('./lib/ai/mimoClient');
-const { MISS_SYSTEM_PROMPT } = require('./lib/ai/prompts');
+} = require('./src/lib/ai/configStore');
+const { callMiMoChat } = require('./src/lib/ai/mimoClient');
+const { MISS_SYSTEM_PROMPT } = require('./src/lib/ai/prompts');
 const {
   normalizeQishuiShareUrl,
   extractQishuiPlaylistFromHtml,
   buildQishuiPlaylistId,
-} = require('./lib/qishui');
+} = require('./src/lib/qishui');
 
 function testParseJsonFence() {
   const parsed = parseAiResponse('```json\n{"reply":"Here","recommendations":[{"trackKey":"netease:1","reason":"calm"}],"actions":[]}\n```');
@@ -295,6 +295,89 @@ function testMusicSoulUiContract() {
   assert.match(server, /allowRecommendations:\s*shouldAllowChatRecommendations/);
 }
 
+function testMissAiDjEnhancementContract() {
+  const html = fs.readFileSync('public/index.html', 'utf8');
+  const main = fs.readFileSync('src/desktop/main.js', 'utf8');
+  const preload = fs.readFileSync('src/desktop/preload.js', 'utf8');
+  const wallpaper = fs.readFileSync('public/wallpaper.html', 'utf8');
+  const server = fs.readFileSync('server.js', 'utf8');
+
+  assert.match(html, /--ms-vinyl-cover/);
+  assert.match(html, /MISS_AI_DJ_AVATAR_SRC/);
+  assert.match(html, /fab\.innerHTML = '<img/);
+  assert.match(html, /function executeMissActions/);
+  assert.match(html, /function missSearchAndPlay/);
+  assert.match(html, /playQueueAt\(idx\)/);
+  assert.match(html, /\/api\/artist\/search\?keyword=/);
+  assert.match(html, /\/api\/artist\/songs\?/);
+  assert.match(html, /function fetchArtistSearchResults/);
+  assert.match(html, /function renderCombinedSearchResults/);
+  assert.match(html, /function chooseCustomVideoWallpaper/);
+  assert.match(html, /chooseVideoWallpaper/);
+  assert.match(html, /customWallpaper/);
+  assert.match(html, /toggleFxPanel\(false\)/);
+  assert.match(html, /closeMissPanel\(\)/);
+
+  assert.match(server, /\/api\/artist\/search/);
+  assert.match(server, /\/api\/artist\/songs/);
+  assert.match(server, /function normalizeArtistSearchResult/);
+
+  assert.match(main, /\bTray\b/);
+  assert.match(main, /\bMenu\b/);
+  assert.match(main, /let tray = null/);
+  assert.match(main, /let isQuitting = false/);
+  assert.match(main, /createAppTray/);
+  assert.match(main, /mineradio-wallpaper-choose-video/);
+  assert.match(main, /wallpapers/);
+
+  assert.match(preload, /chooseVideoWallpaper/);
+  assert.match(preload, /resetVideoWallpaper/);
+
+  assert.match(wallpaper, /customVideo/);
+  assert.match(wallpaper, /wallpaper-video/);
+}
+
+function testMineradioFollowupEnhancementContract() {
+  const html = fs.readFileSync('public/index.html', 'utf8');
+  const main = fs.readFileSync('src/desktop/main.js', 'utf8');
+  const preload = fs.readFileSync('src/desktop/preload.js', 'utf8');
+  const wallpaper = fs.readFileSync('public/wallpaper.html', 'utf8');
+  const server = fs.readFileSync('server.js', 'utf8');
+
+  assert.match(html, /artist-open-btn/);
+  assert.doesNotMatch(html, /fab\.addEventListener\('mouseenter', function\(\)\{\s*if \(!missState\.drag/);
+  assert.match(html, /MISS_COLLAPSE_STORE_KEY/);
+  assert.match(html, /function collapseMissPanelToEdge/);
+  assert.match(html, /function expandMissPanelFromEdge/);
+  assert.match(html, /home-ai-dj-clock/);
+  assert.match(html, /home-music-dna/);
+  assert.match(html, /function refreshHomeMusicDna/);
+  assert.match(html, /login-provider-kugou/);
+  assert.match(html, /user-provider-kugou/);
+  assert.match(html, /multiSourceAccountMode/);
+  assert.match(html, /chooseWallpaperScene/);
+  assert.match(html, /resetWallpaperScene/);
+  assert.match(html, /window-resizing/);
+
+  assert.match(server, /\/api\/kugou\/login\/status/);
+  assert.match(server, /\/api\/kugou\/search/);
+  assert.match(server, /\/api\/kugou\/playlists/);
+
+  assert.match(main, /KUGOU_LOGIN_PARTITION/);
+  assert.match(main, /openKugouMusicLoginWindow/);
+  assert.match(main, /mineradio-wallpaper-choose-scene/);
+  assert.match(main, /chooseWallpaperScene/);
+
+  assert.match(preload, /openKugouMusicLogin/);
+  assert.match(preload, /clearKugouMusicLogin/);
+  assert.match(preload, /chooseWallpaperScene/);
+  assert.match(preload, /resetWallpaperScene/);
+
+  assert.match(wallpaper, /customScene/);
+  assert.match(wallpaper, /scene-preview/);
+  assert.match(wallpaper, /scene-status/);
+}
+
 function testQishuiHelpers() {
   const normalized = normalizeQishuiShareUrl('  https://qishui.douyin.com/s/iRSNtxYM/  ');
   assert.strictEqual(normalized, 'https://qishui.douyin.com/s/iRSNtxYM/');
@@ -319,7 +402,7 @@ function testQishuiUiContract() {
   assert.match(html, /qishuiImportedPlaylists/);
 
   const server = fs.readFileSync('server.js', 'utf8');
-  assert.match(server, /require\('\.\/lib\/qishui'\)/);
+  assert.match(server, /require\('\.\/src\/lib\/qishui'\)/);
   assert.match(server, /\/api\/qishui\/playlist\/import/);
   assert.match(server, /handleQishuiPlaylistImport/);
 }
@@ -339,6 +422,8 @@ testResolveAiConfigPrecedence();
 testMergeAiConfigPreservesAndClearsKey();
 testMusicSoulPromptStartsWithPlayfulGirlPersona();
 testMusicSoulUiContract();
+testMissAiDjEnhancementContract();
+testMineradioFollowupEnhancementContract();
 testQishuiHelpers();
 testQishuiUiContract();
 testCallMiMoChatUsesSelectedAuthHeader().then(() => {

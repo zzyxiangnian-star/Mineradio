@@ -1,7 +1,8 @@
-const { app, BrowserWindow, ipcMain, shell, screen, session, globalShortcut, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, screen, session, globalShortcut, dialog, Tray, Menu } = require('electron');
 const net = require('net');
 const path = require('path');
 const fs = require('fs');
+const { pathToFileURL } = require('url');
 const { execFile, spawn } = require('child_process');
 
 let mainWindow = null;
@@ -19,6 +20,8 @@ let desktopLyricsHotBounds = null;
 let desktopLyricsLastMiddleAt = 0;
 let wallpaperWindow = null;
 let wallpaperState = {};
+let tray = null;
+let isQuitting = false;
 let htmlFullscreenActive = false;
 let windowFullscreenActive = false;
 let mainWindowStateTimer = null;
@@ -36,6 +39,10 @@ const NETEASE_LOGIN_PARTITION = 'persist:mineradio-netease-login';
 const NETEASE_LOGIN_URL = 'https://music.163.com/#/login';
 const QQ_LOGIN_PARTITION = 'persist:mineradio-qqmusic-login';
 const QQ_LOGIN_URL = 'https://y.qq.com/n/ryqq/profile';
+const KUGOU_LOGIN_PARTITION = 'persist:mineradio-kugou-login';
+const KUGOU_LOGIN_URL = 'https://www.kugou.com/';
+const WALLPAPER_VIDEO_EXTENSIONS = new Set(['.mp4', '.webm', '.mov', '.m4v']);
+const WALLPAPER_SCENE_PREVIEW_EXTENSIONS = new Set(['.mp4', '.webm', '.mov', '.m4v', '.jpg', '.jpeg', '.png', '.webp', '.html', '.htm']);
 
 const CHROMIUM_PERFORMANCE_SWITCHES = [
   ['autoplay-policy', 'no-user-gesture-required'],
@@ -88,6 +95,32 @@ const NETEASE_LOGIN_COOKIE_PRIORITY = [
   'WEVNSM',
   'WNMCID',
   'JSESSIONID-WYYY',
+];
+const KUGOU_LOGIN_COOKIE_PRIORITY = [
+  'KuGoo',
+  'KugooID',
+  'KugouID',
+  'kugouid',
+  'mid',
+  'kg_mid',
+  'kg_dfid',
+  'dfid',
+  'kg_uid',
+  'kguser',
+  'username',
+  'NickName',
+  'UserName',
+  't',
+  'userid',
+  'UserID',
+  'uid',
+  'token',
+  'Token',
+  'login_token',
+  'KugouToken',
+  'kg_token',
+  'pic',
+  'nickname',
 ];
 
 function findOpenPort(startPort) {
@@ -268,6 +301,181 @@ function focusMainWindow() {
   return true;
 }
 
+function showMainWindow() {
+  if (focusMainWindow()) return;
+  createWindow().catch((e) => console.error('Show Mineradio failed:', e));
+}
+
+function quitFromTray() {
+  isQuitting = true;
+  app.quit();
+}
+
+function createAppTray() {
+  if (tray && !tray.isDestroyed()) return tray;
+  tray = new Tray(APP_ICON_ICO);
+  tray.setToolTip(APP_NAME);
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: 'Show Mineradio', click: showMainWindow },
+    { type: 'separator' },
+    { label: 'Quit', click: quitFromTray },
+  ]));
+  tray.on('click', showMainWindow);
+  tray.on('double-click', showMainWindow);
+  return tray;
+}
+
+function hideMainWindowToTray(win) {
+  if (!win || win.isDestroyed()) return;
+  createAppTray();
+  if (win.isFullScreen()) win.setFullScreen(false);
+  if (win.isMinimized()) win.restore();
+  win.hide();
+  sendWindowState(win);
+}
+
+function wallpaperVideoDir() {
+  return path.join(app.getPath('userData'), 'wallpapers');
+}
+
+function customWallpaperPathForExt(ext) {
+  return path.join(wallpaperVideoDir(), `custom-wallpaper${ext}`);
+}
+
+function removeExistingCustomWallpapers() {
+  for (const ext of WALLPAPER_VIDEO_EXTENSIONS) {
+    const filePath = customWallpaperPathForExt(ext);
+    try {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    } catch (e) {
+      console.warn('Remove custom wallpaper failed:', e.message);
+    }
+  }
+}
+
+function wallpaperSceneDir() {
+  return path.join(wallpaperVideoDir(), 'scene');
+}
+
+function removeExistingWallpaperScene() {
+  const dir = wallpaperSceneDir();
+  try {
+    if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true });
+  } catch (e) {
+    console.warn('Remove wallpaper scene failed:', e.message);
+  }
+}
+
+function findWallpaperScenePreview(root) {
+  const preferredNames = [
+    'preview.mp4', 'preview.webm', 'preview.jpg', 'preview.jpeg', 'preview.png', 'preview.webp',
+    'index.html', 'index.htm', 'scene.html',
+  ];
+  for (const name of preferredNames) {
+    const p = path.join(root, name);
+    if (fs.existsSync(p) && fs.statSync(p).isFile()) return p;
+  }
+  const stack = [root];
+  while (stack.length) {
+    const dir = stack.shift();
+    let entries = [];
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (_) { entries = []; }
+    for (const entry of entries) {
+      const p = path.join(dir, entry.name);
+      if (entry.isDirectory() && stack.length < 18) {
+        stack.push(p);
+      } else if (entry.isFile() && WALLPAPER_SCENE_PREVIEW_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
+        return p;
+      }
+    }
+  }
+  return '';
+}
+
+function copyWallpaperScenePreview(sourcePath) {
+  if (!sourcePath) return null;
+  const ext = path.extname(sourcePath).toLowerCase() || '.dat';
+  const target = path.join(wallpaperSceneDir(), `scene-preview${ext}`);
+  fs.mkdirSync(wallpaperSceneDir(), { recursive: true });
+  fs.copyFileSync(sourcePath, target);
+  const isVideo = WALLPAPER_VIDEO_EXTENSIONS.has(ext);
+  const isHtml = ext === '.html' || ext === '.htm';
+  return {
+    type: isVideo ? 'video' : (isHtml ? 'html' : 'image'),
+    path: target,
+    url: pathToFileURL(target).toString(),
+    name: path.basename(sourcePath),
+  };
+}
+
+async function chooseWallpaperScene(owner) {
+  const result = await dialog.showOpenDialog(owner || mainWindow || undefined, {
+    title: '选择 Wallpaper 场景文件夹或 project.json',
+    properties: ['openFile', 'openDirectory'],
+    filters: [
+      { name: 'Wallpaper Scene', extensions: ['json', 'html', 'htm', 'mp4', 'webm', 'jpg', 'jpeg', 'png', 'webp'] },
+      { name: 'All Files', extensions: ['*'] },
+    ],
+  });
+  if (result.canceled || !result.filePaths || !result.filePaths[0]) return { ok: false, canceled: true };
+  const selected = result.filePaths[0];
+  const stat = fs.statSync(selected);
+  const root = stat.isDirectory() ? selected : path.dirname(selected);
+  const projectPath = stat.isFile() && path.basename(selected).toLowerCase() === 'project.json'
+    ? selected
+    : path.join(root, 'project.json');
+  const previewSource = stat.isFile() && WALLPAPER_SCENE_PREVIEW_EXTENSIONS.has(path.extname(selected).toLowerCase())
+    ? selected
+    : findWallpaperScenePreview(root);
+  removeExistingWallpaperScene();
+  let project = {};
+  if (fs.existsSync(projectPath)) {
+    try { project = JSON.parse(fs.readFileSync(projectPath, 'utf8')); } catch (_) { project = {}; }
+    fs.mkdirSync(wallpaperSceneDir(), { recursive: true });
+    fs.copyFileSync(projectPath, path.join(wallpaperSceneDir(), 'project.json'));
+  }
+  const preview = copyWallpaperScenePreview(previewSource);
+  return {
+    ok: true,
+    canceled: false,
+    type: 'scene',
+    name: project.title || project.description || path.basename(root),
+    path: root,
+    projectPath: fs.existsSync(projectPath) ? projectPath : '',
+    preview,
+    url: preview && preview.url || '',
+    message: preview ? 'Wallpaper 场景已导入，当前使用可预览资源。' : 'Wallpaper 场景已导入，但没有找到可直接预览的图片/视频/HTML。',
+  };
+}
+
+async function chooseVideoWallpaper(owner) {
+  const result = await dialog.showOpenDialog(owner || mainWindow || undefined, {
+    title: '选择视频壁纸',
+    properties: ['openFile'],
+    filters: [
+      { name: 'Video', extensions: ['mp4', 'webm', 'mov', 'm4v'] },
+      { name: 'All Files', extensions: ['*'] },
+    ],
+  });
+  if (result.canceled || !result.filePaths || !result.filePaths[0]) return { ok: false, canceled: true };
+  const sourcePath = result.filePaths[0];
+  const ext = path.extname(sourcePath).toLowerCase();
+  if (!WALLPAPER_VIDEO_EXTENSIONS.has(ext)) {
+    return { ok: false, error: 'UNSUPPORTED_VIDEO_FORMAT', message: '请选择 mp4、webm、mov 或 m4v 视频文件。' };
+  }
+  fs.mkdirSync(wallpaperVideoDir(), { recursive: true });
+  removeExistingCustomWallpapers();
+  const targetPath = customWallpaperPathForExt(ext);
+  fs.copyFileSync(sourcePath, targetPath);
+  return {
+    ok: true,
+    canceled: false,
+    name: path.basename(sourcePath),
+    path: targetPath,
+    url: pathToFileURL(targetPath).toString(),
+  };
+}
+
 function getUpdateDownloadDir() {
   return path.join(app.getPath('userData'), 'updates');
 }
@@ -361,6 +569,14 @@ function isNeteaseCookieDomain(domain) {
     normalized === 'netease.com' || normalized.endsWith('.netease.com');
 }
 
+function isKugouCookieDomain(domain) {
+  const normalized = String(domain || '').replace(/^\./, '').toLowerCase();
+  return normalized === 'kugou.com' || normalized.endsWith('.kugou.com') ||
+    normalized === 'kugou.cn' || normalized.endsWith('.kugou.cn') ||
+    normalized === 'kgimg.com' || normalized.endsWith('.kgimg.com') ||
+    normalized === 'kugou.net' || normalized.endsWith('.kugou.net');
+}
+
 function buildCookieHeaderFor(cookies, isAllowedDomain, priority) {
   const picked = new Map();
   (cookies || []).forEach((cookie) => {
@@ -397,6 +613,19 @@ async function readNeteaseLoginCookieHeader(cookieSession) {
   return buildCookieHeaderFor(cookies, isNeteaseCookieDomain, NETEASE_LOGIN_COOKIE_PRIORITY);
 }
 
+async function readKugouLoginCookieHeader(cookieSession) {
+  const cookies = await cookieSession.cookies.get({});
+  return buildCookieHeaderFor(cookies, isKugouCookieDomain, KUGOU_LOGIN_COOKIE_PRIORITY);
+}
+
+function kugouCookieHasLogin(cookieText) {
+  const obj = parseCookieHeader(cookieText);
+  const userId = obj.userid || obj.UserID || obj.uid || obj.KugooID || obj.KugouID || obj.kugouid || obj.kg_uid || '';
+  const token = obj.token || obj.Token || obj.login_token || obj.KugouToken || obj.kg_token || obj.t || obj.KuGoo || '';
+  const profile = obj.kguser || obj.nickname || obj.NickName || obj.username || obj.UserName || '';
+  return !!(userId || token || profile);
+}
+
 async function openNeteaseMusicLoginWindow(owner) {
   const cookieSession = session.fromPartition(NETEASE_LOGIN_PARTITION);
   const initialCookie = await readNeteaseLoginCookieHeader(cookieSession);
@@ -405,6 +634,7 @@ async function openNeteaseMusicLoginWindow(owner) {
   return new Promise((resolve) => {
     let settled = false;
     let pollTimer = null;
+    let timeoutTimer = null;
 
     const loginWindow = new BrowserWindow({
       width: 940,
@@ -600,8 +830,121 @@ async function openQQMusicLoginWindow(owner) {
   });
 }
 
+async function openKugouMusicLoginWindow(owner) {
+  const cookieSession = session.fromPartition(KUGOU_LOGIN_PARTITION);
+  const initialCookie = await readKugouLoginCookieHeader(cookieSession);
+  if (kugouCookieHasLogin(initialCookie)) return { ok: true, cookie: initialCookie, reused: true };
+
+  return new Promise((resolve) => {
+    let settled = false;
+    let pollTimer = null;
+
+    const loginWindow = new BrowserWindow({
+      width: 900,
+      height: 720,
+      minWidth: 760,
+      minHeight: 560,
+      parent: owner && !owner.isDestroyed() ? owner : undefined,
+      modal: false,
+      show: false,
+      autoHideMenuBar: true,
+      title: '酷狗音乐登录',
+      backgroundColor: '#111111',
+      icon: APP_ICON_ICO,
+      webPreferences: {
+        partition: KUGOU_LOGIN_PARTITION,
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: true,
+      },
+    });
+
+    const finish = async (result) => {
+      if (settled) return;
+      settled = true;
+      if (pollTimer) clearInterval(pollTimer);
+      if (timeoutTimer) clearTimeout(timeoutTimer);
+      if (loginWindow && !loginWindow.isDestroyed()) loginWindow.close();
+      resolve(result);
+    };
+
+    const checkCookies = async () => {
+      try {
+        const cookie = await readKugouLoginCookieHeader(cookieSession);
+        if (kugouCookieHasLogin(cookie)) finish({ ok: true, cookie });
+      } catch (e) {
+        console.warn('Kugou login cookie check failed:', e.message);
+      }
+    };
+
+    loginWindow.webContents.setWindowOpenHandler(({ url }) => {
+      if (/^https?:\/\/([^/]+\.)?(kugou\.com|kugou\.cn|kugou\.net|kgimg\.com)/i.test(url)) {
+        loginWindow.loadURL(url).catch((e) => console.warn('Kugou login popup navigation failed:', e.message));
+      } else if (/^https?:\/\//i.test(url)) {
+        shell.openExternal(url).catch(() => {});
+      }
+      return { action: 'deny' };
+    });
+
+    loginWindow.webContents.on('did-finish-load', () => {
+      checkCookies();
+      loginWindow.webContents.executeJavaScript(`
+        setTimeout(() => {
+          const nodes = Array.from(document.querySelectorAll('a, button, span, div'));
+          const loginNode = nodes.find((node) => {
+            const text = (node.textContent || '').trim();
+            if (!/登录|登陆|立即登录/.test(text)) return false;
+            const rect = node.getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0;
+          });
+          if (loginNode) loginNode.click();
+        }, 800);
+      `, true).catch(() => {});
+    });
+
+    loginWindow.on('ready-to-show', () => loginWindow.show());
+    loginWindow.on('closed', async () => {
+      if (settled) return;
+      if (pollTimer) clearInterval(pollTimer);
+      if (timeoutTimer) clearTimeout(timeoutTimer);
+      try {
+        const cookie = await readKugouLoginCookieHeader(cookieSession);
+        resolve(kugouCookieHasLogin(cookie)
+          ? { ok: true, cookie }
+          : { ok: false, cancelled: true, message: '酷狗登录窗口已关闭' });
+      } catch (e) {
+        resolve({ ok: false, error: e.message || '酷狗登录窗口已关闭' });
+      }
+    });
+
+    pollTimer = setInterval(checkCookies, 1200);
+    timeoutTimer = setTimeout(async () => {
+      if (settled) return;
+      try {
+        const cookie = await readKugouLoginCookieHeader(cookieSession);
+        if (kugouCookieHasLogin(cookie)) {
+          finish({ ok: true, cookie, partial: true });
+        } else {
+          finish({ ok: false, timeout: true, message: '酷狗登录超时，请确认网页登录已完成后重试' });
+        }
+      } catch (e) {
+        finish({ ok: false, timeout: true, error: e.message || '酷狗登录超时' });
+      }
+    }, 90000);
+    loginWindow.loadURL(KUGOU_LOGIN_URL).catch((e) => finish({ ok: false, error: e.message }));
+  });
+}
+
 async function clearQQMusicLoginSession() {
   const cookieSession = session.fromPartition(QQ_LOGIN_PARTITION);
+  await cookieSession.clearStorageData({
+    storages: ['cookies', 'localstorage', 'indexdb', 'cachestorage'],
+  });
+  return { ok: true };
+}
+
+async function clearKugouMusicLoginSession() {
+  const cookieSession = session.fromPartition(KUGOU_LOGIN_PARTITION);
   await cookieSession.clearStorageData({
     storages: ['cookies', 'localstorage', 'indexdb', 'cachestorage'],
   });
@@ -1118,7 +1461,13 @@ ipcMain.handle('desktop-window-get-state', (event) => {
 });
 
 ipcMain.handle('desktop-window-close', (event) => {
-  getSenderWindow(event)?.close();
+  const win = getSenderWindow(event);
+  if (!win) return;
+  if (win === mainWindow && !isQuitting) {
+    hideMainWindowToTray(win);
+    return;
+  }
+  win.close();
 });
 
 ipcMain.handle('mineradio-hotkeys-configure-global', (_event, bindings) => {
@@ -1174,6 +1523,14 @@ ipcMain.handle('qq-music-open-login', async (event) => {
 
 ipcMain.handle('qq-music-clear-login', async () => {
   return clearQQMusicLoginSession();
+});
+
+ipcMain.handle('kugou-music-open-login', async (event) => {
+  return openKugouMusicLoginWindow(getSenderWindow(event));
+});
+
+ipcMain.handle('kugou-music-clear-login', async () => {
+  return clearKugouMusicLoginSession();
 });
 
 ipcMain.handle('mineradio-open-update-installer', async (_event, filePath) => {
@@ -1317,6 +1674,44 @@ ipcMain.handle('mineradio-wallpaper-update', async (_event, payload) => {
   }
 });
 
+ipcMain.handle('mineradio-wallpaper-choose-video', async (event) => {
+  try {
+    return await chooseVideoWallpaper(getSenderWindow(event));
+  } catch (e) {
+    return { ok: false, error: e.message || 'WALLPAPER_VIDEO_FAILED' };
+  }
+});
+
+ipcMain.handle('mineradio-wallpaper-reset-video', async () => {
+  try {
+    removeExistingCustomWallpapers();
+    wallpaperState = { ...wallpaperState, customVideo: null };
+    sendWallpaperState();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message || 'WALLPAPER_VIDEO_RESET_FAILED' };
+  }
+});
+
+ipcMain.handle('mineradio-wallpaper-choose-scene', async (event) => {
+  try {
+    return await chooseWallpaperScene(getSenderWindow(event));
+  } catch (e) {
+    return { ok: false, error: e.message || 'WALLPAPER_SCENE_FAILED' };
+  }
+});
+
+ipcMain.handle('mineradio-wallpaper-reset-scene', async () => {
+  try {
+    removeExistingWallpaperScene();
+    wallpaperState = { ...wallpaperState, customVideo: null, customScene: null };
+    sendWallpaperState();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message || 'WALLPAPER_SCENE_RESET_FAILED' };
+  }
+});
+
 async function createWindow() {
   htmlFullscreenActive = false;
   windowFullscreenActive = false;
@@ -1327,6 +1722,7 @@ async function createWindow() {
   process.env.PORT = String(port);
   process.env.COOKIE_FILE = path.join(app.getPath('userData'), '.cookie');
   process.env.QQ_COOKIE_FILE = path.join(app.getPath('userData'), '.qq-cookie');
+  process.env.KUGOU_COOKIE_FILE = path.join(app.getPath('userData'), '.kugou-cookie');
   process.env.MINERADIO_UPDATE_DIR = getUpdateDownloadDir();
   try {
     const legacyQQCookie = path.join(__dirname, '..', '..', '.qq-cookie');
@@ -1398,6 +1794,11 @@ async function createWindow() {
   mainWindow.on('blur', () => sendWindowState(mainWindow));
   mainWindow.on('move', () => scheduleWindowStateSend(mainWindow));
   mainWindow.on('resize', () => scheduleWindowStateSend(mainWindow));
+  mainWindow.on('close', (event) => {
+    if (isQuitting) return;
+    event.preventDefault();
+    hideMainWindowToTray(mainWindow);
+  });
   mainWindow.on('closed', () => {
     if (mainWindowStateTimer) {
       clearTimeout(mainWindowStateTimer);
@@ -1439,6 +1840,7 @@ if (!gotSingleInstanceLock) {
   });
 
   app.whenReady().then(async () => {
+    createAppTray();
     screen.on('display-metrics-changed', () => {
       positionDesktopLyricsWindow();
       positionWallpaperWindow();
@@ -1455,12 +1857,15 @@ if (!gotSingleInstanceLock) {
   });
 
   app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+    if (process.platform === 'darwin' && isQuitting) app.quit();
   });
 
   app.on('before-quit', () => {
+    isQuitting = true;
     unregisterMineradioGlobalHotkeys();
     closeOverlayWindows();
+    if (tray && !tray.isDestroyed()) tray.destroy();
+    tray = null;
     if (localServer && localServer.close) localServer.close();
   });
 }

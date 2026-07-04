@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld('desktopWindow', {
   clearNeteaseMusicLogin: () => ipcRenderer.invoke('netease-music-clear-login'),
   openQQMusicLogin: () => ipcRenderer.invoke('qq-music-open-login'),
   clearQQMusicLogin: () => ipcRenderer.invoke('qq-music-clear-login'),
+  openKugouMusicLogin: () => ipcRenderer.invoke('kugou-music-open-login'),
+  clearKugouMusicLogin: () => ipcRenderer.invoke('kugou-music-clear-login'),
   openUpdateInstaller: (filePath) => ipcRenderer.invoke('mineradio-open-update-installer', filePath),
   restartApp: () => ipcRenderer.invoke('mineradio-restart-app'),
   configureGlobalHotkeys: (bindings) => ipcRenderer.invoke('mineradio-hotkeys-configure-global', bindings || []),
@@ -39,6 +41,10 @@ contextBridge.exposeInMainWorld('desktopWindow', {
   },
   setWallpaperMode: (enabled, payload) => ipcRenderer.invoke('mineradio-wallpaper-set-enabled', !!enabled, payload || {}),
   updateWallpaperMode: (payload) => ipcRenderer.invoke('mineradio-wallpaper-update', payload || {}),
+  chooseVideoWallpaper: () => ipcRenderer.invoke('mineradio-wallpaper-choose-video'),
+  resetVideoWallpaper: () => ipcRenderer.invoke('mineradio-wallpaper-reset-video'),
+  chooseWallpaperScene: () => ipcRenderer.invoke('mineradio-wallpaper-choose-scene'),
+  resetWallpaperScene: () => ipcRenderer.invoke('mineradio-wallpaper-reset-scene'),
   onStateChange: (callback) => {
     const listener = (_event, state) => callback(state);
     ipcRenderer.on('desktop-window-state', listener);
