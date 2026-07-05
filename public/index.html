@@ -21,7 +21,7 @@ try {
 html,body{font-family:var(--font-sans);background:#000;color:#fff;overflow:hidden;height:100vh;width:100vw;user-select:none;-webkit-font-smoothing:antialiased}
 body.cursor-hidden,body.cursor-hidden *{cursor:none!important}
 html.desktop-shell-root,html.desktop-shell-root body{background:transparent}
-:root{--font-sans:"Noto Sans SC","PingFang SC","HarmonyOS Sans SC","Alibaba PuHuiTi","Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-mono:"JetBrains Mono","Geist Mono","SF Mono",ui-monospace,monospace;--fc-bg:#08090B;--fc-paper:#0E1014;--fc-ink:#E8ECEF;--fc-ink-2:#D2D7DC;--fc-muted:#8A9099;--fc-hair:#1A1D22;--fc-hair-2:#262A31;--fc-accent:#00F5D4;--fc-accent-hov:#00E0BE;--fc-accent-rgb:0,245,212;--fc-blue:#2442ff;--fc-warm:#f8f4ee;--chill-ink:#030608;--chill-deep:#061116;--chill-cyan:#8fe9ff;--chill-blue:#73a7ff;--chill-mint:#9cffdf;--chill-soft:rgba(214,248,255,.9);--champagne:#f4d28a;--champagne-deep:#9a6f2c;--home-accent:#00f5d4;--home-accent-rgb:0,245,212;--visual-tint:#9db8cf;--source-netease:#d95b67;--source-qq:#00F5D4;--source-kugou:#49d17d;--source-qishui:#ff7aa8;--source-local:#9db8cf}
+:root{--font-sans:"Microsoft YaHei UI","HarmonyOS Sans SC","Noto Sans SC","PingFang SC","Alibaba PuHuiTi","Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-mono:"JetBrains Mono","Geist Mono","SF Mono",ui-monospace,monospace;--fc-bg:#08090B;--fc-paper:#0E1014;--fc-ink:#E8ECEF;--fc-ink-2:#D2D7DC;--fc-muted:#8A9099;--fc-hair:#1A1D22;--fc-hair-2:#262A31;--fc-accent:#00F5D4;--fc-accent-hov:#00E0BE;--fc-accent-rgb:0,245,212;--fc-blue:#2442ff;--fc-warm:#f8f4ee;--chill-ink:#030608;--chill-deep:#061116;--chill-cyan:#8fe9ff;--chill-blue:#73a7ff;--chill-mint:#9cffdf;--chill-soft:rgba(214,248,255,.9);--champagne:#f4d28a;--champagne-deep:#9a6f2c;--home-accent:#00f5d4;--home-accent-rgb:0,245,212;--visual-tint:#9db8cf;--home-ai-wallpaper-image:none;--home-ai-wallpaper-opacity:0;--source-netease:#d95b67;--source-qq:#00F5D4;--source-kugou:#49d17d;--source-qishui:#ff7aa8;--source-local:#9db8cf}
 :root{--glass-bg:linear-gradient(112deg,rgba(72,74,76,.62),rgba(24,27,30,.70) 48%,rgba(8,12,14,.74));--glass-bg-focus:linear-gradient(112deg,rgba(88,91,92,.68),rgba(28,32,35,.76) 50%,rgba(8,13,15,.82));--glass-border:rgba(0,245,212,.30);--glass-border-soft:rgba(255,255,255,.095);--glass-shadow:0 22px 64px rgba(0,0,0,.30),0 0 34px rgba(0,245,212,.052),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -24px 58px rgba(0,0,0,.16);--glass-shadow-focus:0 24px 72px rgba(0,0,0,.34),0 0 0 1px rgba(0,245,212,.13),0 0 42px rgba(0,245,212,.075),inset 0 1px 0 rgba(255,255,255,.20)}
 :root{--saved-panel-glass-bg:rgba(0,0,0,.10);--saved-panel-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-panel-glass-svg-filter:url(#mineradio-control-glass-filter) saturate(1);--saved-panel-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.35),inset 0 0 10px 4px rgba(255,255,255,.15),0 4px 16px rgba(17,17,26,.05),0 8px 24px rgba(17,17,26,.05),0 16px 56px rgba(17,17,26,.05),inset 0 4px 16px rgba(17,17,26,.05),inset 0 8px 24px rgba(17,17,26,.05),inset 0 16px 56px rgba(17,17,26,.05);--saved-panel-glass-radius:50px;--saved-button-glass-bg:rgba(0,0,0,.10);--saved-button-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-button-glass-svg-filter:url(#mineradio-control-glass-filter) saturate(1);--saved-button-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.34),inset 0 0 10px 4px rgba(255,255,255,.13),0 10px 30px rgba(0,0,0,.18);--saved-button-glass-hover-bg:rgba(255,255,255,.055);--saved-button-glass-hover-shadow:inset 0 0 2px 1px rgba(255,255,255,.42),inset 0 0 12px 5px rgba(255,255,255,.17),0 12px 34px rgba(0,0,0,.22),0 0 18px rgba(255,255,255,.06)}
 :root{--home-icon-color:#f4d28a;--home-icon-rgb:244,210,138;--visual-icon-color:#7fd8ff;--visual-icon-rgb:127,216,255}
@@ -244,6 +244,7 @@ body.empty-home-active #canvas-container{filter:none}
 body.home-wallpaper-preview #canvas-container{filter:none}
 .empty-home-shell{height:100%;min-height:440px;display:grid;grid-template-columns:minmax(370px,.94fr) minmax(520px,1.06fr);grid-template-rows:auto 1fr;gap:14px;align-content:stretch}
 .home-hero{position:relative;grid-row:1 / span 2;min-height:438px;padding:28px;border-radius:28px;border:1px solid color-mix(in srgb,var(--home-accent) 22%,rgba(255,255,255,.085));background:linear-gradient(145deg,rgba(33,29,34,.64),rgba(9,10,14,.76) 48%,rgba(17,20,25,.70));box-shadow:0 28px 90px rgba(0,0,0,.34),0 0 0 1px color-mix(in srgb,var(--home-accent) 7%,transparent),inset 0 1px 0 rgba(255,255,255,.065);backdrop-filter:blur(30px) saturate(1.16);-webkit-backdrop-filter:blur(30px) saturate(1.16);overflow:hidden}
+.home-ai-wallpaper-layer{position:absolute;inset:0;z-index:1;background-image:linear-gradient(145deg,rgba(6,8,12,.44),rgba(6,8,12,.68)),var(--home-ai-wallpaper-image);background-size:cover;background-position:center;opacity:var(--home-ai-wallpaper-opacity,0);filter:saturate(1.08) contrast(1.04);transform:scale(1.012);pointer-events:none;transition:opacity .28s ease,background-image .28s ease}
 .home-hero::before{content:'';position:absolute;inset:0;background:linear-gradient(118deg,rgba(255,255,255,.060),transparent 24%,rgba(255,83,103,.070) 54%,rgba(122,215,194,.055) 82%,transparent 100%),linear-gradient(90deg,rgba(255,255,255,.032) 0 1px,transparent 1px 48px),linear-gradient(0deg,rgba(255,255,255,.024) 0 1px,transparent 1px 44px);opacity:.72;pointer-events:none}
 .home-hero::after{content:'';position:absolute;left:28px;right:28px;bottom:22px;height:1px;background:linear-gradient(90deg,color-mix(in srgb,var(--home-accent) 0%,transparent),color-mix(in srgb,var(--home-accent) 52%,transparent),rgba(36,66,255,.24),rgba(248,244,238,.18),color-mix(in srgb,var(--home-accent) 0%,transparent));opacity:.82;pointer-events:none}
 .home-hero-inner{position:relative;z-index:2;height:100%;display:grid;grid-template-columns:minmax(0,1.16fr) minmax(150px,.64fr);grid-template-rows:auto auto auto auto minmax(150px,1fr);column-gap:18px}
@@ -2050,6 +2051,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 <section id="empty-home" aria-label="Mineradio home">
   <div class="empty-home-shell">
     <div class="home-hero">
+      <div class="home-ai-wallpaper-layer" aria-hidden="true"></div>
       <div class="home-hero-inner home-ai-dj-showcase">
         <div class="home-kicker">AI DJ · MUSIC SOUL</div>
         <div class="home-ai-dj-title">Music Soul</div>
@@ -2232,6 +2234,17 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
     <button class="fx-mini-btn ghost" type="button" onclick="document.getElementById('background-image-input').click()">选择</button>
     <div class="fx-color-row-label">背景媒体<small id="bg-image-value">未设置</small></div>
     <button class="fx-mini-btn ghost" type="button" onclick="clearCustomBackgroundImage()">清除</button>
+  </div>
+  <div class="fx-section-label">界面字体</div>
+  <div class="fx-font-grid" id="ui-font-grid">
+    <button type="button" data-ui-font="modern" onclick="setUiFontTheme('modern')">现代</button>
+    <button type="button" data-ui-font="soft" onclick="setUiFontTheme('soft')">柔和</button>
+    <button type="button" data-ui-font="tech" onclick="setUiFontTheme('tech')">科技</button>
+  </div>
+  <div class="lyric-color-row image-pick-row">
+    <button class="fx-mini-btn ghost" type="button" onclick="document.getElementById('home-ai-wallpaper-input').click()">选择</button>
+    <div class="fx-color-row-label">AI DJ 展示栏壁纸<small id="home-ai-wallpaper-value">跟随默认</small></div>
+    <button class="fx-mini-btn ghost" type="button" onclick="clearHomeAiWallpaper()">清除</button>
   </div>
   <div class="fx-slider"><label>背景透明度</label><input id="fx-bgopacity" type="range" min="0" max="1" step="0.01"><output></output></div>
   <div class="fx-slider"><label>控制台玻璃色差</label><input id="fx-glassaberration" type="range" min="0" max="140" step="1"><output></output></div>
@@ -2621,6 +2634,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 
 <input type="file" id="file-input" accept=".mp3,.flac,.wav,.ogg,.m4a,.jpg,.jpeg,.png,.webp" multiple style="display:none">
 <input type="file" id="background-image-input" accept=".jpg,.jpeg,.png,.webp,.mp4,.webm,.mov,image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" style="display:none">
+<input type="file" id="home-ai-wallpaper-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none">
 <div id="drop-overlay"><div class="drop-text">拖放音乐或封面</div></div>
 <div id="free-camera-hint"><b>自由镜头</b> R 固定/退出 · WASD 移动 · 鼠标转向 · Shift 加速 · Space/Ctrl 升降 · Q/E 轻微旋转 · 滚轮景深 · K 回正</div>
 <div id="loading-overlay"><div class="spinner"></div></div>
@@ -3405,6 +3419,8 @@ var fxDefaults = {
   homeAccentColor: '#ffffff',
   homeIconColor: '#ffffff',
   visualIconColor: '#ffffff',
+  uiFontTheme: 'modern',
+  homeAiWallpaperImage: '',
   backgroundColorMode: 'cover',
   backgroundColor: '#000000',
   backgroundOpacity: 1,
@@ -3488,6 +3504,8 @@ var PACKAGED_DEFAULT_FX_SNAPSHOT = Object.freeze({
   homeAccentColor: '#ffffff',
   homeIconColor: '#ffffff',
   visualIconColor: '#ffffff',
+  uiFontTheme: 'modern',
+  homeAiWallpaperImage: '',
   backgroundColorMode: 'cover',
   backgroundColor: '#000000',
   backgroundOpacity: 1,
@@ -3558,6 +3576,8 @@ var playbackVisualPreset = readSavedPlaybackVisualPreset();
 var startupVisualPreviewActive = false;
 var fx = Object.assign({}, fxDefaults, readSavedLyricLayout());
 normalizeDevelopmentLockedFxState();
+applyUiFontTheme();
+applyHomeAiWallpaper();
 var presetTransition = { active:false, start:-10, duration:0.92, from:0, to:0 };
 var controlsAutoHide = readBooleanPreference(CONTROLS_AUTO_HIDE_STORE_KEY, false);
 var controlsHovering = false;
@@ -7768,6 +7788,8 @@ function readSavedLyricLayout() {
       homeAccentColor: normalizeHexColor(raw.homeAccentColor || '#00f5d4'),
       homeIconColor: normalizeHexColor(raw.homeIconColor || fxDefaults.homeIconColor || '#f4d28a', '#f4d28a'),
       visualIconColor: normalizeHexColor(raw.visualIconColor || fxDefaults.visualIconColor || '#7fd8ff', '#7fd8ff'),
+      uiFontTheme: normalizeUiFontTheme(raw.uiFontTheme || fxDefaults.uiFontTheme),
+      homeAiWallpaperImage: normalizeCustomBackgroundImage(raw.homeAiWallpaperImage),
       backgroundColorMode: savedBgCustom ? 'custom' : 'cover',
       backgroundColor: savedBgColor,
       backgroundOpacity: savedBgOpacity,
@@ -7858,6 +7880,8 @@ function saveLyricLayout() {
       homeAccentColor: normalizeHexColor(fx.homeAccentColor || '#00f5d4'),
       homeIconColor: normalizeHexColor(fx.homeIconColor || '#f4d28a', '#f4d28a'),
       visualIconColor: normalizeHexColor(fx.visualIconColor || '#7fd8ff', '#7fd8ff'),
+      uiFontTheme: normalizeUiFontTheme(fx.uiFontTheme || fxDefaults.uiFontTheme),
+      homeAiWallpaperImage: normalizeCustomBackgroundImage(fx.homeAiWallpaperImage),
       backgroundColorMode: fx.backgroundColorMode === 'custom' || fx.backgroundColorCustom ? 'custom' : 'cover',
       backgroundColor: normalizeHexColor(fx.backgroundColor || '#000000', '#000000'),
       backgroundOpacity: clampRange(fx.backgroundOpacity == null ? fxDefaults.backgroundOpacity : Number(fx.backgroundOpacity), 0, 1),
@@ -7976,6 +8000,16 @@ function rgbToHexColor(r, g, b) {
 function normalizeLyricFontKey(value) {
   value = String(value || 'sans');
   return /^(sans|hei|song|bold-song|stone-song|kai-song|serif-en|gothic|editorial|humanist|round|mono|display)$/.test(value) ? value : 'sans';
+}
+function normalizeUiFontTheme(value) {
+  value = String(value || 'modern');
+  return /^(modern|soft|tech)$/.test(value) ? value : 'modern';
+}
+function uiFontStackForTheme(theme) {
+  theme = normalizeUiFontTheme(theme);
+  if (theme === 'soft') return '"HarmonyOS Sans SC","MiSans","Microsoft YaHei UI","PingFang SC","Noto Sans SC",system-ui,sans-serif';
+  if (theme === 'tech') return '"Inter","JetBrains Mono","HarmonyOS Sans SC","Microsoft YaHei UI","Noto Sans SC",system-ui,sans-serif';
+  return '"Microsoft YaHei UI","HarmonyOS Sans SC","Noto Sans SC","PingFang SC","Inter",system-ui,sans-serif';
 }
 function lyricFontStackForKey(key) {
   key = normalizeLyricFontKey(key);
@@ -18075,6 +18109,7 @@ function missArtistName(song) {
 function missTrackSource(song, fallback) {
   var raw = missTrackFirstString(song && song.provider, song && song.source, song && song.type, fallback, 'netease').toLowerCase();
   if (raw.indexOf('qq') >= 0) return 'qq';
+  if (raw.indexOf('kugou') >= 0 || raw.indexOf('kg') >= 0 || raw.indexOf('酷狗') >= 0) return 'kugou';
   if (raw.indexOf('local') >= 0) return 'local';
   if (raw.indexOf('podcast') >= 0) return 'podcast';
   return 'netease';
@@ -18089,7 +18124,7 @@ function normalizeMissCandidate(song, extras) {
   if (!song) return null;
   var source = missTrackSource(song, extras.source);
   var album = song.album || song.al || {};
-  var originalId = missTrackFirstString(song.id, song.trackId, song.qqId, song.mid, song.songmid, song.localKey, song.radioId);
+  var originalId = missTrackFirstString(song.id, song.trackId, song.qqId, song.mid, song.songmid, song.hash, song.FileHash, song.fileHash, song.albumAudioId, song.localKey, song.radioId);
   if (!originalId) return null;
   return {
     trackKey: source + ':' + originalId,
@@ -18116,15 +18151,27 @@ function addMissCandidates(out, seen, items, extras) {
 async function missSearchCandidates(query) {
   query = String(query || '').trim();
   if (!query) return [];
-  try {
-    var results = await Promise.all([
-      apiJson('/api/search?keywords=' + encodeURIComponent(query) + '&limit=12', { timeoutMs: 12000 }),
-      apiJson('/api/qq/search?keywords=' + encodeURIComponent(query) + '&limit=10', { timeoutMs: 12000 })
-    ]);
-    return (results[0].songs || []).concat(results[1].songs || []);
-  } catch (e) {
-    return [];
+  var results = await Promise.allSettled([
+    apiJson('/api/search?keywords=' + encodeURIComponent(query) + '&limit=12', { timeoutMs: 12000 }),
+    apiJson('/api/qq/search?keywords=' + encodeURIComponent(query) + '&limit=10', { timeoutMs: 12000 }),
+    apiJson('/api/kugou/search?keywords=' + encodeURIComponent(query) + '&limit=10', { timeoutMs: 12000 })
+  ]);
+  var pools = results.map(function(res){ return res.status === 'fulfilled' && res.value && Array.isArray(res.value.songs) ? res.value.songs : []; });
+  if (results[1].status === 'rejected') console.warn('Miss QQ search failed:', results[1].reason);
+  if (results[2].status === 'rejected') console.warn('Miss Kugou search failed:', results[2].reason);
+  var out = [];
+  var seen = {};
+  var maxLen = Math.max(pools[0].length, pools[1].length, pools[2].length);
+  for (var i = 0; i < maxLen && out.length < 32; i++) {
+    for (var p = 0; p < pools.length && out.length < 32; p++) {
+      var song = pools[p][i];
+      var c = normalizeMissCandidate(song, {});
+      if (!c || seen[c.trackKey]) continue;
+      seen[c.trackKey] = true;
+      out.push(song);
+    }
   }
+  return out;
 }
 async function buildMissContext(query) {
   var current = (typeof currentCoverSong === 'function') ? currentCoverSong() : (playQueue && currentIdx >= 0 ? playQueue[currentIdx] : null);
@@ -18547,15 +18594,34 @@ async function missQueueAndPlaySong(song, position) {
   if (actual !== expected) return { ok: false, message: '已经找到歌曲，但播放器没有成功切过去。' };
   return { ok: true, song: now || song, index: idx };
 }
+function missPreferredProviderFromQuery(query) {
+  var text = String(query || '').toLowerCase();
+  if (/(qq|qq音乐|qq music)/i.test(text)) return 'qq';
+  if (/(酷狗|kugou|\bkg\b)/i.test(text)) return 'kugou';
+  if (/(网易|网易云|netease|cloud music)/i.test(text)) return 'netease';
+  return '';
+}
+function missSortSongsByPreferredProvider(songs, provider) {
+  songs = Array.isArray(songs) ? songs.slice() : [];
+  provider = String(provider || '');
+  if (!provider) return songs;
+  return songs.sort(function(a, b){
+    var ap = songProviderKey(a) === provider ? 0 : 1;
+    var bp = songProviderKey(b) === provider ? 0 : 1;
+    return ap - bp;
+  });
+}
 async function missSearchAndPlay(query) {
   query = String(query || '').trim();
   if (!query) return { ok: false, message: '你想听什么歌呀？我需要一个歌名或歌手。' };
-  missSetStatus('正在搜索 "' + query + '"...', '');
-  var songs = await fetchMusicSearchResults(query, 'song');
+  var preferredProvider = missPreferredProviderFromQuery(query);
+  missSetStatus('正在' + (preferredProvider === 'qq' ? 'QQ 音乐' : (preferredProvider === 'kugou' ? '酷狗音乐' : (preferredProvider === 'netease' ? '网易云音乐' : '全音源'))) + '搜索 "' + query + '"...', '');
+  var songs = await fetchMusicSearchResults(query, preferredProvider || 'song');
   if (!songs.length) {
     var artistData = await apiJson('/api/artist/songs?name=' + encodeURIComponent(query) + '&limit=24', { timeoutMs: 12000 }).catch(function(){ return null; });
     songs = (artistData && artistData.songs) || [];
   }
+  songs = missSortSongsByPreferredProvider(songs, preferredProvider);
   if (!songs.length) return { ok: false, message: '没有找到能播放的 "' + query + '"。' };
   return missQueueAndPlaySong(songs[0], 'next');
 }
@@ -18566,7 +18632,9 @@ async function missCreateTempQueue(query, limit) {
   missSetStatus('正在整理 "' + query + '" 的临时队列...', '');
   var data = await apiJson('/api/artist/songs?name=' + encodeURIComponent(query) + '&limit=' + num, { timeoutMs: 14000 }).catch(function(){ return null; });
   var songs = (data && data.songs) || [];
-  if (!songs.length) songs = await fetchMusicSearchResults(query, 'song');
+  var preferredProvider = missPreferredProviderFromQuery(query);
+  if (!songs.length) songs = await fetchMusicSearchResults(query, preferredProvider || 'song');
+  songs = missSortSongsByPreferredProvider(songs, preferredProvider);
   songs = (songs || []).filter(function(song){ return song && song.name; }).slice(0, num);
   if (!songs.length) return { ok: false, message: '没有找到足够的 "' + query + '" 歌曲。' };
   playQueue = songs.map(cloneSong);
@@ -18602,7 +18670,9 @@ async function executeMissAction(action, fallbackQuery) {
   if (type === 'add_to_queue' || type === 'add_all_to_queue') {
     var addSong = missFindCandidateByTrackKey(action.trackKey) || action.song;
     if (!addSong && action.query) {
-      var found = await fetchMusicSearchResults(action.query, 'song');
+      var provider = missPreferredProviderFromQuery(action.query);
+      var found = await fetchMusicSearchResults(action.query, provider || 'song');
+      found = missSortSongsByPreferredProvider(found, provider);
       addSong = found[0];
     }
     if (!addSong) return { ok: false, message: '没有找到可加入队列的歌曲。' };
@@ -21838,6 +21908,8 @@ function normalizeFxArchiveSnapshot(raw) {
     homeAccentColor: normalizeHexColor(raw.homeAccentColor || fxDefaults.homeAccentColor, fxDefaults.homeAccentColor),
     homeIconColor: normalizeHexColor(raw.homeIconColor || fxDefaults.homeIconColor, fxDefaults.homeIconColor),
     visualIconColor: normalizeHexColor(raw.visualIconColor || fxDefaults.visualIconColor, fxDefaults.visualIconColor),
+    uiFontTheme: normalizeUiFontTheme(raw.uiFontTheme || fxDefaults.uiFontTheme),
+    homeAiWallpaperImage: normalizeCustomBackgroundImage(raw.homeAiWallpaperImage),
     backgroundColorMode: raw.backgroundColorMode === 'custom' || raw.backgroundColorCustom ? 'custom' : 'cover',
     backgroundColor: normalizeHexColor(raw.backgroundColor || fxDefaults.backgroundColor, fxDefaults.backgroundColor),
     backgroundOpacity: archiveNumber(raw, 'backgroundOpacity', fxDefaults.backgroundOpacity, 0, 1),
@@ -22407,6 +22479,77 @@ function setVisualIconColor(color, silent) {
 }
 function resetVisualIconColor() {
   setVisualIconColor(fxDefaults.visualIconColor || '#7fd8ff');
+}
+function applyUiFontTheme() {
+  var theme = normalizeUiFontTheme((fx && fx.uiFontTheme) || fxDefaults.uiFontTheme);
+  document.documentElement.style.setProperty('--font-sans', uiFontStackForTheme(theme));
+  document.documentElement.setAttribute('data-ui-font-theme', theme);
+}
+function updateUiFontControls() {
+  applyUiFontTheme();
+  var theme = normalizeUiFontTheme((fx && fx.uiFontTheme) || fxDefaults.uiFontTheme);
+  document.querySelectorAll('#ui-font-grid [data-ui-font]').forEach(function(btn){
+    btn.classList.toggle('active', btn.getAttribute('data-ui-font') === theme);
+  });
+}
+function setUiFontTheme(theme, silent) {
+  fx.uiFontTheme = normalizeUiFontTheme(theme);
+  updateUiFontControls();
+  saveLyricLayout();
+  if (!silent) showToast('界面字体已切换');
+}
+function applyHomeAiWallpaper() {
+  var image = normalizeCustomBackgroundImage((fx && fx.homeAiWallpaperImage) || '');
+  var root = document.documentElement;
+  root.style.setProperty('--home-ai-wallpaper-image', image ? 'url("' + cssImageUrl(image) + '")' : 'none');
+  root.style.setProperty('--home-ai-wallpaper-opacity', image ? '0.58' : '0');
+  document.body.classList.toggle('home-ai-wallpaper-custom', !!image);
+}
+function updateHomeAiWallpaperControls() {
+  applyHomeAiWallpaper();
+  var label = document.getElementById('home-ai-wallpaper-value');
+  if (label) label.textContent = normalizeCustomBackgroundImage(fx.homeAiWallpaperImage) ? '自定义图片' : '跟随默认';
+}
+function setHomeAiWallpaperImage(src, silent) {
+  fx.homeAiWallpaperImage = normalizeCustomBackgroundImage(src);
+  updateHomeAiWallpaperControls();
+  saveLyricLayout();
+  if (!silent) showToast(fx.homeAiWallpaperImage ? 'AI DJ 展示栏壁纸已应用' : 'AI DJ 展示栏壁纸已清除');
+}
+function clearHomeAiWallpaper() {
+  setHomeAiWallpaperImage('');
+}
+function readHomeAiWallpaperFile(file) {
+  if (!file || !/^image\//i.test(file.type || '')) {
+    showToast('请选择图片文件');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var maxSide = 1800;
+      var iw = img.naturalWidth || img.width || 1;
+      var ih = img.naturalHeight || img.height || 1;
+      var scale = Math.min(1, maxSide / Math.max(iw, ih));
+      var w = Math.max(1, Math.round(iw * scale));
+      var h = Math.max(1, Math.round(ih * scale));
+      var cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      var cx = cv.getContext('2d');
+      cx.drawImage(img, 0, 0, w, h);
+      var out = '';
+      try { out = cv.toDataURL('image/webp', 0.82); } catch (err) {}
+      if (!/^data:image\/webp/i.test(out)) {
+        try { out = cv.toDataURL('image/jpeg', 0.84); } catch (err2) { out = String(e.target.result || ''); }
+      }
+      setHomeAiWallpaperImage(out);
+    };
+    img.onerror = function(){ showToast('AI DJ 壁纸读取失败'); };
+    img.src = e.target.result;
+  };
+  reader.onerror = function(){ showToast('AI DJ 壁纸读取失败'); };
+  reader.readAsDataURL(file);
 }
 function applyCustomBackground() {
   var color = normalizeHexColor(fx.backgroundColor || '#000000', '#000000');
@@ -23305,6 +23448,8 @@ function updateFxInputs() {
   updateUiAccentControls();
   updateHomeAccentControls();
   updateIconAccentControls();
+  updateUiFontControls();
+  updateHomeAiWallpaperControls();
   updateCustomBackgroundControls();
   updateVisualTintControls();
   applyControlGlassChromaticOffset();
@@ -24040,6 +24185,14 @@ function bindFxPanel() {
     bgImageInput.addEventListener('change', function(e){
       var file = e.target.files && e.target.files[0];
       if (file) readBackgroundMediaFile(file);
+      e.target.value = '';
+    });
+  }
+  var homeAiWallpaperInput = document.getElementById('home-ai-wallpaper-input');
+  if (homeAiWallpaperInput) {
+    homeAiWallpaperInput.addEventListener('change', function(e){
+      var file = e.target.files && e.target.files[0];
+      if (file) readHomeAiWallpaperFile(file);
       e.target.value = '';
     });
   }
