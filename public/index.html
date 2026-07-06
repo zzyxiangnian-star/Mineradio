@@ -15959,6 +15959,78 @@ function sendHomeAiCommand() {
   if (input) input.value = '';
   sendMissChat();
 }
+
+var vinylHomePlaybackSession = false;
+
+function syncVinylHomeTrack() {
+  if (!window.MineradioVinylHome) return;
+  var song = currentIdx >= 0 ? playQueue[currentIdx] : null;
+  window.MineradioVinylHome.syncTrack(song, currentIdx);
+  window.MineradioVinylHome.syncPlayback(!!(audio && audio.src && !audio.paused && !audio.ended));
+}
+
+function createVinylHomeAdapter() {
+  return {
+    songKey: function(song) {
+      return queueItemKey(song || {});
+    },
+    coverFor: function(song) {
+      if (!song) return '';
+      var custom = getCustomCoverForSong(song);
+      return custom || (song.cover ? coverUrlWithSize(song.cover, 480) : '');
+    },
+    openPicker: openVinylPlaylistPicker,
+    playCandidate: function(tracks, index, meta) {
+      if (!tracks[index]) return Promise.resolve(false);
+      vinylHomePlaybackSession = true;
+      homeSuppressed = false;
+      homeForcedOpen = true;
+      vinylPlaylistCandidates = tracks.slice();
+      vinylPlaylistMeta = meta || vinylPlaylistMeta;
+      playQueue = tracks.map(cloneSong);
+      currentIdx = index;
+      safeRenderQueuePanel('vinyl-home-select');
+      safeSwitchPlaylistTab('queue', 'vinyl-home-select');
+      safeShelfRebuild('vinyl-home-select', true);
+      return Promise.resolve(playQueueAt(index, { preserveHomeState: true, vinylPlaylist: meta })).then(function() {
+        syncVinylHomeTrack();
+        return true;
+      });
+    },
+    togglePlay: function() {
+      return togglePlay();
+    },
+    previous: function() {
+      return prevTrack();
+    },
+    next: function() {
+      return nextTrack();
+    },
+    setVolume: function(value) {
+      setVolume(value, true);
+    },
+    submitChat: function(text) {
+      if (!text) {
+        openHomeAiDjPanel();
+        return;
+      }
+      if (!openMissPanel()) return;
+      var missInput = document.getElementById('miss-input');
+      if (missInput) missInput.value = text;
+      sendMissChat();
+    },
+  };
+}
+
+function initVinylHome() {
+  if (!window.MineradioVinylHome) return;
+  window.MineradioVinylHome.mount(createVinylHomeAdapter());
+  var slider = document.getElementById('home-vinyl-volume-slider');
+  if (slider) slider.value = targetVolume;
+  if (vinylPlaylistCandidates.length) window.MineradioVinylHome.setPlaylist(vinylPlaylistMeta, vinylPlaylistCandidates);
+  syncVinylHomeTrack();
+}
+
 function renderHomeDiscover() {
   var sub = document.getElementById('home-subtitle');
   var loggedOutHome = !homeDiscoverState.loggedIn && !hasAnyPlatformLogin();
@@ -16581,6 +16653,7 @@ function goHome() {
 }
 function dismissHomePage(opts) {
   opts = opts || {};
+  vinylHomePlaybackSession = false;
   homeForcedOpen = false;
   homeSuppressed = true;
   setHomeControlsLocked(false);
@@ -19549,6 +19622,8 @@ function updateVolumeUi() {
         ? '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15 10.5a2 2 0 0 1 0 3"/>'
         : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15 9.5a4 4 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/>';
   }
+  var homeSlider = document.getElementById('home-vinyl-volume-slider');
+  if (homeSlider && Math.abs(parseFloat(homeSlider.value) - targetVolume) > 0.001) homeSlider.value = targetVolume;
 }
 
 function setVolume(value, silent) {
@@ -19923,6 +19998,7 @@ function syncPlaybackStateFromAudioEvent(reason) {
   if (!isPlaying) hideLoading();
   if (reason === 'play' || reason === 'playing') switchPlaybackVisualToEmily();
   forcePlaybackControlsInteractive();
+  if (window.MineradioVinylHome) window.MineradioVinylHome.syncPlayback(isPlaying);
 }
 
 function isPlaybackRecursionError(err) {
@@ -19967,6 +20043,7 @@ function scheduleAudioResumePosition(media, seconds, token) {
 
 async function playQueueAt(idx, opts) {
   opts = opts || {};
+  if (vinylHomePlaybackSession) opts.preserveHomeState = true;
   if (idx < 0 || idx >= playQueue.length) return;
   markRenderInteraction('track-switch', 1500);
   var playPhase = 'start';
@@ -19974,8 +20051,13 @@ async function playQueueAt(idx, opts) {
   try {
   markPlayPhase('session-finalize');
   safePlaybackStep('session-finalize', function(){ finalizeListenSession(false); });
-  homeForcedOpen = false;
-  if (!opts.preserveHomeState) homeSuppressed = false;
+  if (opts.preserveHomeState) {
+    homeSuppressed = false;
+    homeForcedOpen = true;
+  } else {
+    homeForcedOpen = false;
+    homeSuppressed = false;
+  }
   currentIdx = idx;
   trackSwitchToken++;
   markPlayPhase('cancel-previous-track');
@@ -20010,6 +20092,7 @@ async function playQueueAt(idx, opts) {
     document.getElementById('thumb-artist').textContent = song.artist;
     updateControlTrackInfo(song);
     document.getElementById('thumb-wrap').classList.add('visible');
+    syncVinylHomeTrack();
   });
   markPlayPhase('lyric-prep');
   safePlaybackStep('lyric-prep', function(){
@@ -21248,7 +21331,10 @@ async function selectPlaylistForVinylHome(provider, pid, title) {
     if (panel) panel.classList.remove('vinyl-picking');
     togglePlaylistPanel(false);
     setPeek(panel, false, 'pl');
-    if (window.MineradioVinylHome) window.MineradioVinylHome.setPlaylist(vinylPlaylistMeta, vinylPlaylistCandidates);
+    if (window.MineradioVinylHome) {
+      window.MineradioVinylHome.setPlaylist(vinylPlaylistMeta, vinylPlaylistCandidates);
+      syncVinylHomeTrack();
+    }
     showToast('唱片蜂窝已载入 ' + tracks.length + ' 首');
   } catch (error) {
     console.warn('[VinylPlaylistSelect]', error);
@@ -24618,6 +24704,7 @@ function setImmersiveMode(on) {
   if (immersiveMode === on) return;
 
   if (on) {
+    vinylHomePlaybackSession = false;
     immersiveState = {
       shelfMode: fx.shelf,
       shelfPinnedOpen: shelfPinnedOpen,
@@ -29106,5 +29193,6 @@ function animate() {
 animate();
 </script>
 <script src="home-vinyl.js"></script>
+<script>initVinylHome();</script>
 </body>
 </html>
