@@ -306,6 +306,12 @@ function testMusicSoulUiContract() {
   assert.match(vinylController, /requestAnimationFrame/);
   assert.match(vinylController, /visibleIndices/);
   assert.match(vinylController, /setPointerCapture/);
+  assert.match(html, /var vinylPlaylistPickerActive = false/);
+  assert.match(html, /function openVinylPlaylistPicker/);
+  assert.match(html, /function fetchVinylPlaylistTracks/);
+  assert.match(html, /function selectPlaylistForVinylHome/);
+  assert.match(html, /if \(vinylPlaylistPickerActive\) \{/);
+  assert.match(html, /MineradioVinylHome\.setPlaylist/);
   assert.doesNotMatch(html, /<div class="home-grid">/);
   assert.doesNotMatch(html, /id="home-continue-title"/);
   assert.doesNotMatch(html, /id="home-music-dna-summary"/);

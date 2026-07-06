@@ -21197,6 +21197,67 @@ function scrollPlaylistPanelDetailIntoView(key) {
     catch (e) { panel.scrollTop = top; }
   });
 }
+var vinylPlaylistPickerActive = false;
+var vinylPlaylistSelectionToken = 0;
+var vinylPlaylistCandidates = [];
+var vinylPlaylistMeta = null;
+
+function openVinylPlaylistPicker() {
+  vinylPlaylistPickerActive = true;
+  var panel = document.getElementById('playlist-panel');
+  if (panel) panel.classList.add('vinyl-picking');
+  openPlaylistPanelTab('playlists', true);
+  refreshUserPlaylists();
+  showToast('选择一个歌单放入唱片蜂窝');
+}
+
+async function fetchVinylPlaylistTracks(provider, pid) {
+  provider = normalizePlaylistProvider(provider);
+  if (provider === 'qishui') {
+    var cached = findQishuiPlaylist(pid);
+    return cached && cached.tracks ? cached.tracks.map(cloneSong) : [];
+  }
+  var endpoint = provider === 'qq'
+    ? '/api/qq/playlist/tracks?id='
+    : provider === 'kugou'
+      ? '/api/kugou/playlist/tracks?id='
+      : '/api/playlist/tracks?id=';
+  var result = await apiJson(endpoint + encodeURIComponent(pid));
+  if (result && result.error) throw new Error(result.error);
+  return (result && result.tracks || []).map(cloneSong);
+}
+
+async function selectPlaylistForVinylHome(provider, pid, title) {
+  var token = ++vinylPlaylistSelectionToken;
+  showLoading();
+  try {
+    var tracks = await fetchVinylPlaylistTracks(provider, pid);
+    if (token !== vinylPlaylistSelectionToken) return;
+    if (!tracks.length) {
+      showToast('这个歌单暂时没有歌曲');
+      return;
+    }
+    vinylPlaylistCandidates = tracks;
+    vinylPlaylistMeta = {
+      provider: normalizePlaylistProvider(provider),
+      id: String(pid),
+      title: title || '我的歌单',
+    };
+    vinylPlaylistPickerActive = false;
+    var panel = document.getElementById('playlist-panel');
+    if (panel) panel.classList.remove('vinyl-picking');
+    togglePlaylistPanel(false);
+    setPeek(panel, false, 'pl');
+    if (window.MineradioVinylHome) window.MineradioVinylHome.setPlaylist(vinylPlaylistMeta, vinylPlaylistCandidates);
+    showToast('唱片蜂窝已载入 ' + tracks.length + ' 首');
+  } catch (error) {
+    console.warn('[VinylPlaylistSelect]', error);
+    showToast('歌单加载失败');
+  } finally {
+    hideLoading();
+  }
+}
+
 async function openPlaylistPanelDetail(provider, pid, title) {
   if (!pid) return;
   provider = normalizePlaylistProvider(provider);
@@ -21425,7 +21486,14 @@ document.getElementById('pl-list').addEventListener('click', function(e){
   if (!card) return;
   var provider = card.getAttribute('data-playlist-provider') || 'netease';
   var pid = card.getAttribute('data-playlist-id') || '';
-  openPlaylistPanelDetail(provider, pid, card.getAttribute('data-playlist-title') || '');
+  var playlistTitle = card.getAttribute('data-playlist-title') || '';
+  if (vinylPlaylistPickerActive) {
+    e.preventDefault();
+    e.stopPropagation();
+    selectPlaylistForVinylHome(provider, pid, playlistTitle);
+    return;
+  }
+  openPlaylistPanelDetail(provider, pid, playlistTitle);
 });
 var podcastListEl = document.getElementById('podcast-list');
 if (podcastListEl) {
