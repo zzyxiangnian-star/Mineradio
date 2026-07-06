@@ -285,9 +285,22 @@ function testMusicSoulUiContract() {
   assert.match(html, /function openMissPanel/);
   assert.match(html, /function openHomeAiDjSettings/);
   assert.match(html, /function openHomeAiDjSmartContinue/);
-  assert.match(html, /onclick="openHomeAiDjPanel\(\)"/);
-  assert.match(html, /onclick="openHomeAiDjSmartContinue\(\)"/);
-  assert.match(html, /onclick="openHomeAiDjSettings\(\)"/);
+  assert.doesNotMatch(html, /onclick="openHomeAiDjPanel\(\)"/);
+  assert.doesNotMatch(html, /onclick="openHomeAiDjSmartContinue\(\)"/);
+  assert.doesNotMatch(html, /onclick="openHomeAiDjSettings\(\)"/);
+  assert.match(html, /href="home-vinyl\.css"/);
+  assert.match(html, /id="home-vinyl-player"/);
+  assert.match(html, /id="home-vinyl-viewport"/);
+  assert.match(html, /id="home-vinyl-grid"/);
+  assert.match(html, /id="home-vinyl-tonearm"/);
+  assert.match(html, /id="home-vinyl-play"/);
+  assert.match(html, /id="home-vinyl-prev"/);
+  assert.match(html, /id="home-vinyl-next"/);
+  assert.match(html, /id="home-vinyl-volume"/);
+  assert.match(html, /onclick="openVinylPlaylistPicker\(\)"/);
+  assert.doesNotMatch(html, /<div class="home-grid">/);
+  assert.doesNotMatch(html, /id="home-continue-title"/);
+  assert.doesNotMatch(html, /id="home-music-dna-summary"/);
   assert.ok(!html.includes('此处施工'));
   assert.ok(!html.includes("return 'me';"));
 

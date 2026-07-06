@@ -6,6 +6,8 @@
 <title>Mineradio</title>
 <meta name="referrer" content="no-referrer">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+<link href="home-vinyl.css" rel="stylesheet">
+<script src="home-vinyl-layout.js"></script>
 <script src="vendor/three.r128.min.js"></script>
 <script src="vendor/music-tempo.min.js"></script>
 <script src="vendor/gsap.min.js"></script>
@@ -2049,101 +2051,64 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 
 <!-- 空场 Home -->
 <section id="empty-home" aria-label="Mineradio home">
-  <div class="empty-home-shell">
-    <div class="home-hero">
+  <div class="empty-home-shell home-vinyl-shell">
+    <section class="home-vinyl-left" aria-label="Music Soul 唱片播放器">
       <div class="home-ai-wallpaper-layer" aria-hidden="true"></div>
-      <div class="home-hero-inner home-ai-dj-showcase">
-        <div class="home-kicker">AI DJ · MUSIC SOUL</div>
-        <div class="home-ai-dj-title">Music Soul</div>
-        <div class="home-ai-dj-sub">让 MS 按你的心情、当前播放和歌单上下文接住下一首歌。想听林俊杰、深夜安静一点，或者直接续播，都可以交给她。</div>
-        <div class="home-ai-dj-mark" aria-hidden="true"></div>
-        <div class="home-ai-dj-status" aria-label="AI DJ 状态">
-          <span>MS 音乐搭子</span>
-          <span>MiMo AI</span>
-          <span>队列推荐</span>
+      <header class="home-vinyl-intro">
+        <img class="home-vinyl-avatar" src="assets/ms-ai-dj-avatar.jpg" alt="Music Soul">
+        <div class="home-vinyl-intro-copy">
+          <div class="home-vinyl-kicker"><i aria-hidden="true"></i> AI DJ ONLINE</div>
+          <h1>Music Soul <span>MS</span></h1>
+          <p>懂你此刻，也替你接住下一首。</p>
         </div>
-        <div class="home-ai-next" aria-label="AI 下一首候选">
-          <div>
-            <div class="home-ai-next-label">MS 正在接下一首</div>
-            <div id="home-ai-next-title" class="home-ai-next-title">等待当前歌曲</div>
-            <div id="home-ai-next-sub" class="home-ai-next-sub">基于当前播放、最近偏好和歌单上下文生成候选</div>
+      </header>
+
+      <div id="home-vinyl-player" class="home-vinyl-player" data-playing="false">
+        <div class="home-vinyl-deck">
+          <div id="home-vinyl-tonearm" class="home-vinyl-tonearm" aria-hidden="true">
+            <i class="home-vinyl-tonearm-pivot"></i>
+            <i class="home-vinyl-tonearm-arm"></i>
+            <i class="home-vinyl-tonearm-head"></i>
           </div>
-          <button class="home-ai-next-play" type="button" onclick="playHomeAiNext()" title="播放候选">▶</button>
-        </div>
-        <div class="home-ai-dj-clock" aria-label="时间与天气">
-          <span id="home-ai-dj-time">--:--</span>
-          <span id="home-ai-dj-weather">天气整理中</span>
-          <span id="home-ai-dj-city">当前位置</span>
-        </div>
-        <div class="home-music-dna" aria-label="音乐风格分析">
-          <div class="home-music-dna-head">
-            <div class="home-music-dna-title">Music DNA</div>
-            <div class="home-music-dna-actions"><button id="home-music-dna-ai-btn" class="home-music-dna-action" type="button" onclick="analyzeHomeMusicDna(true)">AI 分析</button><button class="home-music-dna-action" type="button" onclick="showHomeMusicDnaFull()">完整分析</button></div>
+          <div id="home-vinyl-disc" class="home-vinyl-main-disc">
+            <div id="home-vinyl-cover" class="home-vinyl-main-cover"></div>
+            <i class="home-vinyl-hole" aria-hidden="true"></i>
           </div>
-          <span id="home-music-dna-summary" class="home-music-dna-summary">播放几首歌后，MS 会把你的音乐人格慢慢拼出来。</span>
-          <div id="home-music-dna-tags" class="home-music-dna-tags"></div>
         </div>
-        <div class="home-ai-command" aria-label="AI 一句话指令">
-          <input id="home-ai-command-input" type="text" placeholder="让 MS 帮你接下一首歌，比如：播放周杰伦安静一点的歌" onkeydown="if(event.key==='Enter')sendHomeAiCommand()">
-          <button type="button" onclick="sendHomeAiCommand()">发送</button>
+        <div class="home-vinyl-track-line">
+          <strong id="home-vinyl-title">选择一张唱片</strong>
+          <span aria-hidden="true">·</span>
+          <span id="home-vinyl-artist">Music Soul</span>
         </div>
-        <div class="home-ai-dj-pulse" aria-hidden="true"><i style="--h:22px;--d:-.1s"></i><i style="--h:48px;--d:-.34s"></i><i style="--h:31px;--d:-.58s"></i><i style="--h:62px;--d:-.2s"></i><i style="--h:38px;--d:-.72s"></i><i style="--h:55px;--d:-.44s"></i><i style="--h:26px;--d:-.9s"></i></div>
-        <div class="home-ai-dj-actions">
-          <button class="home-chip home-console-chip" type="button" onclick="openHomeAiDjPanel()">打开 AI DJ</button>
-          <button id="home-smart-continue-chip" class="home-chip home-smart-toggle" type="button" onclick="openHomeAiDjSmartContinue()">智能续播 <b>ON</b></button>
-          <button class="home-chip" type="button" onclick="openHomeAiDjSettings()">AI 设置</button>
-          <button class="home-chip" type="button" onclick="openHomePlayerConsole()">播放器控制台</button>
+        <div class="home-vinyl-controls" aria-label="主页播放器控制">
+          <button id="home-vinyl-prev" type="button" aria-label="上一首">‹</button>
+          <button id="home-vinyl-play" class="primary" type="button" aria-label="播放或暂停">▶</button>
+          <button id="home-vinyl-next" type="button" aria-label="下一首">›</button>
+          <div class="home-vinyl-volume-wrap">
+            <button id="home-vinyl-volume" type="button" aria-label="音量">◖</button>
+            <div class="home-vinyl-volume-pop" role="group" aria-label="音量控制">
+              <input id="home-vinyl-volume-slider" type="range" min="0" max="1" step="0.01" value="1" aria-label="主页音量">
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="home-grid">
-      <div class="home-grid-head"><span>我的音乐</span><small>歌单 / 继续听 / 画像</small></div>
-      <button class="home-card" data-home-tone="library" type="button" onclick="openHomeLibrary()">
-        <div class="home-card-label">Library</div>
-        <div class="home-card-title" id="home-weather-card-title">我的歌单</div>
-        <div class="home-card-sub" id="home-weather-card-sub">打开左侧歌单库</div>
-        <div class="home-card-art" id="home-weather-art"></div>
-      </button>
-      <button class="home-card" data-home-tone="mix" type="button" onclick="playHomeSong(0)">
-        <div class="home-card-label">今日推荐</div>
-        <div class="home-card-title" id="home-daily-title">每日推荐</div>
-        <div class="home-card-sub" id="home-daily-sub">登录后同步你的今日歌曲</div>
-        <div class="home-card-art" id="home-daily-art"></div>
-      </button>
-      <button class="home-card" data-home-tone="playlist" type="button" onclick="playHomeSong(1)">
-        <div class="home-card-label">继续播放</div>
-        <div class="home-card-title" id="home-private-title">私人电台</div>
-        <div class="home-card-sub" id="home-private-sub">从你的推荐和歌单里开播</div>
-        <div class="home-card-art" id="home-private-art"></div>
-      </button>
-      <button class="home-card" data-home-tone="mix" type="button" onclick="playHomeRecent()">
-        <div class="home-card-label">Continue</div>
-        <div class="home-card-title" id="home-continue-title">继续听</div>
-        <div class="home-card-sub" id="home-continue-sub">最近播放会出现在这里</div>
-        <div class="home-card-art" id="home-continue-art"></div>
-      </button>
-      <button class="home-card" data-home-tone="local" type="button" onclick="openHomeInsight()">
-        <div class="home-card-label">Profile</div>
-        <div class="home-card-title" id="home-profile-title">听歌画像</div>
-        <div class="home-card-sub" id="home-profile-sub">播放几首后生成偏好</div>
-        <div class="home-card-art" id="home-profile-art"></div>
-      </button>
-      <button class="home-card" data-home-tone="local" type="button" onclick="playHomeSong(2)">
-        <div class="home-card-label">Song</div>
-        <div class="home-card-title" id="home-library-title">常听歌手</div>
-        <div class="home-card-sub" id="home-library-sub">你的偏好会在这里汇总</div>
-        <div class="home-card-art" id="home-library-art"></div>
-      </button>
-    </div>
+      <form id="home-vinyl-chat" class="home-vinyl-chat">
+        <input id="home-vinyl-chat-input" type="text" autocomplete="off" placeholder="告诉 MS 你现在想听什么…" aria-label="向 Music Soul 发送消息">
+        <button type="submit" aria-label="发送给 Music Soul">➜</button>
+      </form>
+    </section>
 
-    <div class="home-rail">
-      <div class="home-section-head">
-        <div class="home-section-title" id="home-rail-title">为你准备</div>
-        <div class="home-section-note" id="home-rail-note">正在整理推荐</div>
+    <section class="home-vinyl-right" aria-label="动态唱片蜂窝">
+      <header class="home-vinyl-library-head">
+        <div><small>NOW BROWSING</small><strong id="home-vinyl-playlist-title">选择一个歌单</strong></div>
+        <button type="button" onclick="openVinylPlaylistPicker()">切换歌单</button>
+      </header>
+      <div id="home-vinyl-viewport" class="home-vinyl-viewport">
+        <div id="home-vinyl-grid" class="home-vinyl-grid" role="listbox" aria-label="歌单歌曲唱片"></div>
+        <div id="home-vinyl-empty" class="home-vinyl-empty">从“我的歌单”选择音乐</div>
       </div>
-      <div id="home-tile-row" class="home-tile-row"></div>
-    </div>
+    </section>
   </div>
 </section>
 
