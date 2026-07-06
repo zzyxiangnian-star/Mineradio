@@ -23,6 +23,7 @@ const {
   extractQishuiPlaylistFromHtml,
   buildQishuiPlaylistId,
 } = require('./src/lib/qishui');
+const VinylLayout = require('./public/home-vinyl-layout');
 
 function testParseJsonFence() {
   const parsed = parseAiResponse('```json\n{"reply":"Here","recommendations":[{"trackKey":"netease:1","reason":"calm"}],"actions":[]}\n```');
@@ -407,6 +408,44 @@ function testQishuiUiContract() {
   assert.match(server, /handleQishuiPlaylistImport/);
 }
 
+function testVinylHexLayoutUsesStaggeredRows() {
+  const layout = VinylLayout.buildHexLayout(7, 100);
+  assert.strictEqual(layout.items.length, 7);
+  assert.deepStrictEqual(layout.items[0], { index: 0, row: 0, column: 0, x: 0, y: 0 });
+  assert.deepStrictEqual(layout.items[3], { index: 3, row: 1, column: 0, x: 45, y: 78 });
+  assert.strictEqual(layout.spacingX, 90);
+  assert.strictEqual(layout.spacingY, 78);
+}
+
+function testVinylVisualWeightFallsTowardCircleEdge() {
+  const center = VinylLayout.visualForPoint(0, 0, 300);
+  const edge = VinylLayout.visualForPoint(300, 0, 300);
+  assert.ok(center.scale >= 1.2 && center.scale <= 1.35);
+  assert.ok(edge.scale >= 0.65 && edge.scale <= 0.8);
+  assert.ok(center.opacity > edge.opacity);
+  assert.ok(center.zIndex > edge.zIndex);
+}
+
+function testVinylNearestAndSnapUseViewportCenter() {
+  const layout = VinylLayout.buildHexLayout(8, 100);
+  const nearest = VinylLayout.nearestIndex(layout.items, { x: 12, y: -20 }, { x: 50, y: 58 });
+  const snap = VinylLayout.snapOffsetForIndex(layout.items, nearest, { x: 50, y: 58 });
+  assert.strictEqual(layout.items[nearest].x + snap.x, 50);
+  assert.strictEqual(layout.items[nearest].y + snap.y, 58);
+}
+
+function testVinylVisibilityDoesNotReturnEntireLargePlaylist() {
+  const layout = VinylLayout.buildHexLayout(300, 82);
+  const visible = VinylLayout.visibleIndices(layout.items, { x: 0, y: 0 }, {
+    width: 620,
+    height: 620,
+    radius: 310,
+    overscan: 100,
+  });
+  assert.ok(visible.length > 0);
+  assert.ok(visible.length < 120);
+}
+
 testParseJsonFence();
 testParsePlainJson();
 testParsePlainTextFallback();
@@ -426,6 +465,10 @@ testMissAiDjEnhancementContract();
 testMineradioFollowupEnhancementContract();
 testQishuiHelpers();
 testQishuiUiContract();
+testVinylHexLayoutUsesStaggeredRows();
+testVinylVisualWeightFallsTowardCircleEdge();
+testVinylNearestAndSnapUseViewportCenter();
+testVinylVisibilityDoesNotReturnEntireLargePlaylist();
 testCallMiMoChatUsesSelectedAuthHeader().then(() => {
   console.log('AI helper module tests passed');
 }).catch((error) => {
