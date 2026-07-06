@@ -298,6 +298,14 @@ function testMusicSoulUiContract() {
   assert.match(html, /id="home-vinyl-next"/);
   assert.match(html, /id="home-vinyl-volume"/);
   assert.match(html, /onclick="openVinylPlaylistPicker\(\)"/);
+  const vinylController = fs.readFileSync('public/home-vinyl.js', 'utf8');
+  assert.match(vinylController, /window\.MineradioVinylHome/);
+  assert.match(vinylController, /function setPlaylist/);
+  assert.match(vinylController, /function syncTrack/);
+  assert.match(vinylController, /function syncPlayback/);
+  assert.match(vinylController, /requestAnimationFrame/);
+  assert.match(vinylController, /visibleIndices/);
+  assert.match(vinylController, /setPointerCapture/);
   assert.doesNotMatch(html, /<div class="home-grid">/);
   assert.doesNotMatch(html, /id="home-continue-title"/);
   assert.doesNotMatch(html, /id="home-music-dna-summary"/);
