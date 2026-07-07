@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Electron-33-47848F?logo=electron&logoColor=white" alt="Electron 33" />
     <img src="https://img.shields.io/badge/Node.js-%E2%89%A518-339933?logo=nodedotjs&logoColor=white" alt="Node.js 18+" />
     <img src="https://img.shields.io/badge/Three.js-r128-000000?logo=threedotjs&logoColor=white" alt="Three.js r128" />
-    <img src="https://img.shields.io/badge/version-1.3.5-74d7c4" alt="Version 1.3.5" />
+    <img src="https://img.shields.io/badge/version-1.4.0-74d7c4" alt="Version 1.4.0" />
     <a href="./LICENSE"><img src="https://img.shields.io/github/license/zzyxiangnian-star/Mineradio" alt="MIT License" /></a>
   </p>
 
