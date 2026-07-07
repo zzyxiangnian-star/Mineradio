@@ -15,6 +15,7 @@ const {
   metadataFromConfig,
   resolveAiConfig,
   mergeAiConfigUpdate,
+  detectAiProvider,
 } = require('./src/lib/ai/configStore');
 const { callMiMoChat } = require('./src/lib/ai/mimoClient');
 const { MISS_SYSTEM_PROMPT } = require('./src/lib/ai/prompts');
@@ -214,6 +215,23 @@ function testMergeAiConfigPreservesAndClearsKey() {
   assert.strictEqual(cleared.apiKey, '');
 }
 
+function testDeepSeekConfigCompatibility() {
+  assert.strictEqual(typeof detectAiProvider, 'function');
+  assert.strictEqual(detectAiProvider('https://api.deepseek.com'), 'deepseek');
+  const migrated = resolveAiConfig({
+    saved: { enabled: true, apiKey: 'deep-key', baseUrl: 'https://api.deepseek.com', model: 'mimo-v2.5-pro', authMethod: 'api-key' },
+    env: {},
+  });
+  assert.strictEqual(migrated.model, 'deepseek-v4-pro');
+  assert.strictEqual(migrated.authMethod, 'bearer');
+  const explicit = resolveAiConfig({
+    saved: { enabled: true, apiKey: 'deep-key', baseUrl: 'https://api.deepseek.com', model: 'deepseek-v4-flash', authMethod: 'api-key' },
+    env: {},
+  });
+  assert.strictEqual(explicit.model, 'deepseek-v4-flash');
+  assert.strictEqual(explicit.authMethod, 'bearer');
+}
+
 function testMusicSoulPromptStartsWithPlayfulGirlPersona() {
   assert.ok(MISS_SYSTEM_PROMPT.startsWith('你是 Music Soul，简称 MS，是 Mineradio 播放器里住着的 AI 音乐搭子。'));
   assert.match(MISS_SYSTEM_PROMPT, /说话轻轻俏皮的女生朋友/);
@@ -239,6 +257,11 @@ async function testCallMiMoChatUsesSelectedAuthHeader() {
       config: { enabled: true, apiKey: 'secret-two', baseUrl: 'https://api.xiaomimimo.com/v1/chat/completions', model: 'mimo-v2.5-pro', authMethod: 'bearer' },
       timeoutMs: 1000,
     });
+    await callMiMoChat([{ role: 'user', content: 'hi' }], {
+      config: { enabled: true, apiKey: 'deep-secret', baseUrl: 'https://api.deepseek.com', model: 'mimo-v2.5-pro', authMethod: 'api-key' },
+      timeoutMs: 1000,
+      maxCompletionTokens: 321,
+    });
   } finally {
     global.fetch = originalFetch;
   }
@@ -248,6 +271,16 @@ async function testCallMiMoChatUsesSelectedAuthHeader() {
   assert.strictEqual(calls[1].url, 'https://api.xiaomimimo.com/v1/chat/completions');
   assert.strictEqual(calls[1].options.headers.Authorization, 'Bearer secret-two');
   assert.strictEqual(calls[1].options.headers['api-key'], undefined);
+  const mimoBody = JSON.parse(calls[0].options.body);
+  assert.strictEqual(mimoBody.max_completion_tokens, 1024);
+  assert.strictEqual(mimoBody.max_tokens, undefined);
+  assert.strictEqual(calls[2].url, 'https://api.deepseek.com/chat/completions');
+  assert.strictEqual(calls[2].options.headers.Authorization, 'Bearer deep-secret');
+  assert.strictEqual(calls[2].options.headers['api-key'], undefined);
+  const deepSeekBody = JSON.parse(calls[2].options.body);
+  assert.strictEqual(deepSeekBody.model, 'deepseek-v4-pro');
+  assert.strictEqual(deepSeekBody.max_tokens, 321);
+  assert.strictEqual(deepSeekBody.max_completion_tokens, undefined);
 }
 
 function testMusicSoulUiContract() {
@@ -285,23 +318,46 @@ function testMusicSoulUiContract() {
   assert.match(html, /function openMissPanel/);
   assert.match(html, /function openHomeAiDjSettings/);
   assert.match(html, /function openHomeAiDjSmartContinue/);
+  assert.match(html, /splashAutoDismissTimer/);
+  assert.match(html, /setTimeout\(function\(\)\{\s*if \(splashReadyToEnter\) dismissSplash\(\);\s*\}, 700\)/);
+  assert.match(html, /splashTimer = setTimeout\(markSplashReadyToEnter, 2600\)/);
   assert.doesNotMatch(html, /onclick="openHomeAiDjPanel\(\)"/);
   assert.doesNotMatch(html, /onclick="openHomeAiDjSmartContinue\(\)"/);
   assert.doesNotMatch(html, /onclick="openHomeAiDjSettings\(\)"/);
   assert.match(html, /href="home-vinyl\.css"/);
-  assert.match(html, /id="home-vinyl-player"/);
+  assert.match(html, /class="home-vinyl-ambient"/);
+  assert.doesNotMatch(html, /id="home-vinyl-player"/);
   assert.match(html, /id="home-vinyl-viewport"/);
   assert.match(html, /id="home-vinyl-grid"/);
-  assert.match(html, /id="home-vinyl-tonearm"/);
-  assert.match(html, /id="home-vinyl-play"/);
-  assert.match(html, /id="home-vinyl-prev"/);
-  assert.match(html, /id="home-vinyl-next"/);
-  assert.match(html, /id="home-vinyl-volume"/);
+  assert.doesNotMatch(html, /id="home-vinyl-tonearm"/);
+  assert.doesNotMatch(html, /id="home-vinyl-play"/);
+  assert.doesNotMatch(html, /id="home-vinyl-prev"/);
+  assert.doesNotMatch(html, /id="home-vinyl-next"/);
+  assert.doesNotMatch(html, /id="home-vinyl-volume"/);
+  assert.doesNotMatch(html, /aria-label="主页播放器控制"/);
   assert.match(html, /onclick="openVinylPlaylistPicker\(\)"/);
   const vinylController = fs.readFileSync('public/home-vinyl.js', 'utf8');
   assert.match(vinylController, /window\.MineradioVinylHome/);
+  assert.match(vinylController, /event\.stopPropagation\(\)/);
+  assert.match(vinylController, /event\.preventDefault\(\)/);
+  assert.match(vinylController, /data-dragging/);
+  assert.match(vinylController, /downIndex/);
+  assert.match(vinylController, /downPoint/);
+  assert.match(vinylController, /suppressNextClick/);
+  assert.match(vinylController, /function playIndex/);
+  assert.match(vinylController, /playIndex\(clickIndex\)/);
+  assert.match(vinylController, /playIndex\(index\)/);
+  assert.match(vinylController, /function onWheel/);
+  assert.match(vinylController, /zoom:\s*1/);
+  assert.match(vinylController, /maxZoom:\s*2\.35/);
+  assert.match(vinylController, /passive:\s*false/);
+  assert.match(vinylController, /zoom:\s*state\.zoom/);
+  assert.doesNotMatch(vinylController, /function onPlayClick/);
+  assert.doesNotMatch(vinylController, /player:'home-vinyl-player'/);
   assert.match(vinylController, /function setPlaylist/);
   assert.match(vinylController, /function syncTrack/);
+  const syncTrackSource = vinylController.slice(vinylController.indexOf('function syncTrack'), vinylController.indexOf('function syncPlayback'));
+  assert.doesNotMatch(syncTrackSource, /selectIndex\(/);
   assert.match(vinylController, /function syncPlayback/);
   assert.match(vinylController, /requestAnimationFrame/);
   assert.match(vinylController, /visibleIndices/);
@@ -319,6 +375,26 @@ function testMusicSoulUiContract() {
   assert.match(html, /preserveHomeState: true/);
   assert.match(html, /MineradioVinylHome\.syncPlayback/);
   assert.match(html, /homeForcedOpen = true/);
+  const vinylCss = fs.readFileSync('public/home-vinyl.css', 'utf8');
+  assert.match(html, /role="listbox"/);
+  assert.match(html, /id="home-vinyl-empty"[^>]*role="status"[^>]*aria-live="polite"/);
+  assert.match(html, /class="home-vinyl-wallpaper-video"/);
+  assert.match(html, /accept="image\/\*,video\/\*"/);
+  assert.match(html, /AI DJ 展示栏壁纸/);
+  assert.match(html, /function normalizeHomeVinylWallpaperMedia/);
+  assert.match(html, /function syncHomeVinylWallpaperVideo/);
+  assert.match(html, /homeVinylWallpaperMedia/);
+  assert.match(html, /\.home-vinyl-shell/);
+  assert.match(vinylCss, /clip-path:circle\(50% at 50% 50%\)/);
+  assert.match(vinylCss, /prefers-reduced-motion:reduce/);
+  assert.doesNotMatch(vinylCss, /home-vinyl-tonearm-elbow/);
+  assert.doesNotMatch(vinylCss, /\.home-vinyl-player\{/);
+  assert.doesNotMatch(vinylCss, /\.home-vinyl-controls\{/);
+  assert.match(vinylCss, /home-vinyl-wallpaper-video/);
+  assert.match(vinylCss, /mask-image:radial-gradient/);
+  assert.match(vinylCss, /\.home-vinyl-viewport\{[^}]*background:transparent/);
+  assert.doesNotMatch(vinylCss, /\.home-vinyl-viewport\{[^}]*rgba\(6,10,14/);
+  assert.doesNotMatch(vinylCss, /\.home-vinyl-viewport\{[^}]*border:/);
   assert.doesNotMatch(html, /<div class="home-grid">/);
   assert.doesNotMatch(html, /id="home-continue-title"/);
   assert.doesNotMatch(html, /id="home-music-dna-summary"/);
@@ -335,11 +411,28 @@ function testMissAiDjEnhancementContract() {
   const main = fs.readFileSync('src/desktop/main.js', 'utf8');
   const preload = fs.readFileSync('src/desktop/preload.js', 'utf8');
   const wallpaper = fs.readFileSync('public/wallpaper.html', 'utf8');
+  const trayMenu = fs.existsSync('public/tray-menu.html') ? fs.readFileSync('public/tray-menu.html', 'utf8') : '';
   const server = fs.readFileSync('server.js', 'utf8');
 
   assert.match(html, /--ms-vinyl-cover/);
   assert.match(html, /MISS_AI_DJ_AVATAR_SRC/);
-  assert.match(html, /fab\.innerHTML = '<img/);
+  assert.match(html, /function normalizeMissAvatarMedia/);
+  assert.match(html, /function applyMissAvatarMedia/);
+  assert.match(html, /function readMissAvatarMediaFile/);
+  assert.match(html, /function normalizeMissChatWallpaperMedia/);
+  assert.match(html, /function syncMissChatWallpaperVideo/);
+  assert.match(html, /function readMissChatWallpaperFile/);
+  assert.match(html, /missAvatarMedia/);
+  assert.match(html, /missChatWallpaperMedia/);
+  assert.match(html, /id="miss-avatar-input"[^>]*accept="image\/\*,video\/\*"/);
+  assert.match(html, /id="miss-wallpaper-input"[^>]*accept="image\/\*,video\/\*"/);
+  assert.match(html, /id="miss-avatar-zoom"/);
+  assert.match(html, /id="miss-wallpaper-zoom"/);
+  assert.match(html, /miss-wallpaper-video/);
+  assert.match(html, /ms-avatar-media/);
+  const earlyChatWallpaperApply = html.indexOf('applyMissChatWallpaperMedia();');
+  const missStateInit = html.indexOf('var missState =');
+  assert.ok(earlyChatWallpaperApply === -1 || earlyChatWallpaperApply > missStateInit, 'chat wallpaper should not touch missState before missState is initialized');
   assert.match(html, /function executeMissActions/);
   assert.match(html, /function missSearchAndPlay/);
   assert.match(html, /playQueueAt\(idx\)/);
@@ -350,6 +443,17 @@ function testMissAiDjEnhancementContract() {
   assert.match(html, /function chooseCustomVideoWallpaper/);
   assert.match(html, /chooseVideoWallpaper/);
   assert.match(html, /customWallpaper/);
+  assert.match(html, /function buildDesktopShellState/);
+  assert.match(html, /function currentDesktopThumbnailClip/);
+  assert.match(html, /thumbnailClip:\s*currentDesktopThumbnailClip\(\)/);
+  assert.match(html, /function scheduleDesktopShellStatePush/);
+  assert.match(html, /function pushDesktopShellState/);
+  assert.match(html, /function handleDesktopShellCommand/);
+  assert.match(html, /updateShellState/);
+  assert.match(html, /onShellCommand/);
+  assert.match(html, /case 'setPlayMode'/);
+  assert.match(html, /toggleFx\('wallpaperMode'\)/);
+  assert.match(html, /toggleFx\('desktopLyrics'\)/);
   assert.match(html, /toggleFxPanel\(false\)/);
   assert.match(html, /closeMissPanel\(\)/);
 
@@ -360,16 +464,53 @@ function testMissAiDjEnhancementContract() {
   assert.match(main, /\bTray\b/);
   assert.match(main, /\bMenu\b/);
   assert.match(main, /let tray = null/);
+  assert.match(main, /let desktopShellState =/);
+  assert.match(main, /let trayMenuWindow = null/);
   assert.match(main, /let isQuitting = false/);
   assert.match(main, /createAppTray/);
+  assert.match(main, /function normalizeDesktopShellState/);
+  assert.match(main, /function updateDesktopShellState/);
+  assert.match(main, /function dispatchShellCommand/);
+  assert.match(main, /function createTrayMenuWindow/);
+  assert.match(main, /function showTrayMenuWindow/);
+  assert.match(main, /function positionTrayMenuWindow/);
+  assert.match(main, /function updateWindowsThumbarButtons/);
+  assert.match(main, /function updateWindowsThumbnailPreview/);
+  assert.match(main, /function normalizeThumbnailClip/);
+  assert.match(main, /setThumbnailClip/);
+  assert.match(main, /createThumbarIcon\('prev'\)/);
+  assert.match(main, /createThumbarIcon\(desktopShellState\.playing \? 'pause' : 'play'\)/);
+  assert.match(main, /createThumbarIcon\('next'\)/);
+  assert.match(main, /setThumbarButtons/);
+  assert.match(main, /mineradio-shell-state-update/);
+  assert.match(main, /mineradio-tray-menu-command/);
+  assert.match(main, /tray-menu\.html/);
+  assert.match(main, /const TRAY_MENU_HEIGHT = 510/);
+  assert.match(main, /MINERADIO_ALLOW_MULTI_INSTANCE/);
+  assert.match(main, /app\.requestSingleInstanceLock\(\)/);
   assert.match(main, /mineradio-wallpaper-choose-video/);
   assert.match(main, /wallpapers/);
 
   assert.match(preload, /chooseVideoWallpaper/);
   assert.match(preload, /resetVideoWallpaper/);
+  assert.match(preload, /updateShellState:\s*\(payload\)\s*=>\s*ipcRenderer\.invoke\('mineradio-shell-state-update'/);
+  assert.match(preload, /onShellCommand:\s*\(callback\)\s*=>/);
+  assert.match(preload, /mineradio-shell-command/);
+  assert.match(preload, /notifyShellCommandResult:\s*\(payload\)\s*=>\s*ipcRenderer\.invoke\('mineradio-shell-command-result'/);
 
   assert.match(wallpaper, /customVideo/);
   assert.match(wallpaper, /wallpaper-video/);
+
+  assert.match(trayMenu, /tray-menu-card/);
+  assert.match(trayMenu, /window\.trayMenu/);
+  assert.match(trayMenu, /data-command="togglePlay"/);
+  assert.match(trayMenu, /data-command="setPlayMode"/);
+  assert.match(trayMenu, /data-mode="shuffle"/);
+  assert.match(trayMenu, /data-command="toggleWallpaper"/);
+  assert.match(trayMenu, /data-command="toggleDesktopLyrics"/);
+  assert.match(trayMenu, /data-command="quit"/);
+  assert.match(trayMenu, /class="tray-footer"[\s\S]*data-command="quit"/);
+  assert.match(trayMenu, /\.items\s*\{[^}]*overflow-y:\s*auto/);
 }
 
 function testMineradioFollowupEnhancementContract() {
@@ -446,16 +587,17 @@ function testVinylHexLayoutUsesStaggeredRows() {
   const layout = VinylLayout.buildHexLayout(7, 100);
   assert.strictEqual(layout.items.length, 7);
   assert.deepStrictEqual(layout.items[0], { index: 0, row: 0, column: 0, x: 0, y: 0 });
-  assert.deepStrictEqual(layout.items[3], { index: 3, row: 1, column: 0, x: 45, y: 78 });
-  assert.strictEqual(layout.spacingX, 90);
-  assert.strictEqual(layout.spacingY, 78);
+  assert.deepStrictEqual(layout.items[3], { index: 3, row: 1, column: 0, x: 59, y: 104 });
+  assert.strictEqual(layout.spacingX, 118);
+  assert.strictEqual(layout.spacingY, 104);
 }
 
 function testVinylVisualWeightFallsTowardCircleEdge() {
   const center = VinylLayout.visualForPoint(0, 0, 300);
   const edge = VinylLayout.visualForPoint(300, 0, 300);
-  assert.ok(center.scale >= 1.2 && center.scale <= 1.35);
-  assert.ok(edge.scale >= 0.65 && edge.scale <= 0.8);
+  assert.ok(center.scale >= 1.08 && center.scale <= 1.16);
+  assert.ok(edge.scale >= 0.68 && edge.scale <= 0.76);
+  assert.ok(edge.opacity <= 0.28);
   assert.ok(center.opacity > edge.opacity);
   assert.ok(center.zIndex > edge.zIndex);
 }
@@ -493,6 +635,7 @@ testNormalizeBaseUrlRejectsUnsafeRemoteHttp();
 testMaskApiKeyAndMetadata();
 testResolveAiConfigPrecedence();
 testMergeAiConfigPreservesAndClearsKey();
+testDeepSeekConfigCompatibility();
 testMusicSoulPromptStartsWithPlayfulGirlPersona();
 testMusicSoulUiContract();
 testMissAiDjEnhancementContract();

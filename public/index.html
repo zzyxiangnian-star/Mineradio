@@ -23,7 +23,7 @@ try {
 html,body{font-family:var(--font-sans);background:#000;color:#fff;overflow:hidden;height:100vh;width:100vw;user-select:none;-webkit-font-smoothing:antialiased}
 body.cursor-hidden,body.cursor-hidden *{cursor:none!important}
 html.desktop-shell-root,html.desktop-shell-root body{background:transparent}
-:root{--font-sans:"Microsoft YaHei UI","HarmonyOS Sans SC","Noto Sans SC","PingFang SC","Alibaba PuHuiTi","Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-mono:"JetBrains Mono","Geist Mono","SF Mono",ui-monospace,monospace;--fc-bg:#08090B;--fc-paper:#0E1014;--fc-ink:#E8ECEF;--fc-ink-2:#D2D7DC;--fc-muted:#8A9099;--fc-hair:#1A1D22;--fc-hair-2:#262A31;--fc-accent:#00F5D4;--fc-accent-hov:#00E0BE;--fc-accent-rgb:0,245,212;--fc-blue:#2442ff;--fc-warm:#f8f4ee;--chill-ink:#030608;--chill-deep:#061116;--chill-cyan:#8fe9ff;--chill-blue:#73a7ff;--chill-mint:#9cffdf;--chill-soft:rgba(214,248,255,.9);--champagne:#f4d28a;--champagne-deep:#9a6f2c;--home-accent:#00f5d4;--home-accent-rgb:0,245,212;--visual-tint:#9db8cf;--home-ai-wallpaper-image:none;--home-ai-wallpaper-opacity:0;--source-netease:#d95b67;--source-qq:#00F5D4;--source-kugou:#49d17d;--source-qishui:#ff7aa8;--source-local:#9db8cf}
+:root{--font-sans:"Microsoft YaHei UI","HarmonyOS Sans SC","Noto Sans SC","PingFang SC","Alibaba PuHuiTi","Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-mono:"JetBrains Mono","Geist Mono","SF Mono",ui-monospace,monospace;--fc-bg:#08090B;--fc-paper:#0E1014;--fc-ink:#E8ECEF;--fc-ink-2:#D2D7DC;--fc-muted:#8A9099;--fc-hair:#1A1D22;--fc-hair-2:#262A31;--fc-accent:#00F5D4;--fc-accent-hov:#00E0BE;--fc-accent-rgb:0,245,212;--fc-blue:#2442ff;--fc-warm:#f8f4ee;--chill-ink:#030608;--chill-deep:#061116;--chill-cyan:#8fe9ff;--chill-blue:#73a7ff;--chill-mint:#9cffdf;--chill-soft:rgba(214,248,255,.9);--champagne:#f4d28a;--champagne-deep:#9a6f2c;--home-accent:#00f5d4;--home-accent-rgb:0,245,212;--visual-tint:#9db8cf;--home-ai-wallpaper-image:none;--home-ai-wallpaper-opacity:0;--miss-avatar-zoom:1;--miss-avatar-x:0%;--miss-avatar-y:0%;--miss-wallpaper-zoom:1;--miss-wallpaper-x:0%;--miss-wallpaper-y:0%;--source-netease:#d95b67;--source-qq:#00F5D4;--source-kugou:#49d17d;--source-qishui:#ff7aa8;--source-local:#9db8cf}
 :root{--glass-bg:linear-gradient(112deg,rgba(72,74,76,.62),rgba(24,27,30,.70) 48%,rgba(8,12,14,.74));--glass-bg-focus:linear-gradient(112deg,rgba(88,91,92,.68),rgba(28,32,35,.76) 50%,rgba(8,13,15,.82));--glass-border:rgba(0,245,212,.30);--glass-border-soft:rgba(255,255,255,.095);--glass-shadow:0 22px 64px rgba(0,0,0,.30),0 0 34px rgba(0,245,212,.052),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -24px 58px rgba(0,0,0,.16);--glass-shadow-focus:0 24px 72px rgba(0,0,0,.34),0 0 0 1px rgba(0,245,212,.13),0 0 42px rgba(0,245,212,.075),inset 0 1px 0 rgba(255,255,255,.20)}
 :root{--saved-panel-glass-bg:rgba(0,0,0,.10);--saved-panel-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-panel-glass-svg-filter:url(#mineradio-control-glass-filter) saturate(1);--saved-panel-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.35),inset 0 0 10px 4px rgba(255,255,255,.15),0 4px 16px rgba(17,17,26,.05),0 8px 24px rgba(17,17,26,.05),0 16px 56px rgba(17,17,26,.05),inset 0 4px 16px rgba(17,17,26,.05),inset 0 8px 24px rgba(17,17,26,.05),inset 0 16px 56px rgba(17,17,26,.05);--saved-panel-glass-radius:50px;--saved-button-glass-bg:rgba(0,0,0,.10);--saved-button-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-button-glass-svg-filter:url(#mineradio-control-glass-filter) saturate(1);--saved-button-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.34),inset 0 0 10px 4px rgba(255,255,255,.13),0 10px 30px rgba(0,0,0,.18);--saved-button-glass-hover-bg:rgba(255,255,255,.055);--saved-button-glass-hover-shadow:inset 0 0 2px 1px rgba(255,255,255,.42),inset 0 0 12px 5px rgba(255,255,255,.17),0 12px 34px rgba(0,0,0,.22),0 0 18px rgba(255,255,255,.06)}
 :root{--home-icon-color:#f4d28a;--home-icon-rgb:244,210,138;--visual-icon-color:#7fd8ff;--visual-icon-rgb:127,216,255}
@@ -1081,12 +1081,15 @@ body.login-guide-active #login-guide-canvas{opacity:1}
 #miss-fab::before{content:'';position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.10);box-shadow:inset 0 0 18px rgba(255,255,255,.055);pointer-events:none;z-index:1}
 #miss-fab::after{content:'';position:absolute;left:10px;right:10px;top:7px;height:15px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.04));opacity:.74;pointer-events:none;transform:rotate(-12deg);z-index:3}
 #miss-fab:hover,#miss-fab.active{transform:translateY(-2px) scale(1.04);border-color:rgba(var(--fc-accent-rgb),.48);color:#fff;box-shadow:0 18px 50px rgba(var(--fc-accent-rgb),.13),0 16px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.34),inset 0 -12px 24px rgba(0,0,0,.18)}
-#miss-fab img{width:calc(100% - 10px);height:calc(100% - 10px);border-radius:50%;object-fit:cover;display:block;filter:saturate(1.02) contrast(1.02) brightness(.92);opacity:.82;position:relative;z-index:2;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+#miss-fab img,#miss-fab video{width:calc(100% - 10px);height:calc(100% - 10px);border-radius:50%;object-fit:cover;object-position:calc(50% + var(--miss-avatar-x,0%)) calc(50% + var(--miss-avatar-y,0%));display:block;filter:saturate(1.02) contrast(1.02) brightness(.92);opacity:.82;position:relative;z-index:2;box-shadow:0 0 0 1px rgba(255,255,255,.08);transform:scale(var(--miss-avatar-zoom,1));transform-origin:center}
 #miss-fab.miss-hidden{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(8px) scale(.92)}
 body.controls-visible #miss-fab,body.desktop-shell.diy-mode.controls-visible #miss-fab{top:58px}
 #miss-panel{--ms-cover-bg:none;--ms-vinyl-cover:url("assets/ms-ai-dj-avatar.jpg");position:fixed;z-index:329;right:-470px;bottom:156px;width:min(444px,calc(100vw - 48px));max-height:min(650px,calc(100vh - 196px));overflow:hidden;overscroll-behavior:contain;background:linear-gradient(150deg,rgba(14,16,22,.76),rgba(4,6,10,.86));border:1px solid rgba(var(--fc-accent-rgb),.18);border-radius:20px;padding:16px 16px 18px;backdrop-filter:blur(30px) saturate(1.34);-webkit-backdrop-filter:blur(30px) saturate(1.34);box-shadow:var(--glass-shadow);opacity:0;pointer-events:none;transform:translateY(18px) scale(.97);transition:left .42s cubic-bezier(.16,1,.3,1),top .42s cubic-bezier(.16,1,.3,1),right .55s cubic-bezier(.16,1,.3,1),opacity .45s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1);font-family:var(--font-sans)}
-#miss-panel::before{content:'';position:absolute;inset:-42px;background-image:var(--ms-cover-bg);background-size:cover;background-position:center;filter:blur(80px) saturate(1.32);opacity:.34;transform:scale(1.12);transition:background-image .5s ease,opacity .5s ease;pointer-events:none}
-#miss-panel::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 0,rgba(var(--fc-accent-rgb),.12),transparent 42%),linear-gradient(180deg,rgba(0,0,0,.22),rgba(0,0,0,.58));pointer-events:none}
+#miss-panel::before{content:'';position:absolute;inset:-42px;background-image:var(--ms-cover-bg);background-size:cover;background-position:calc(50% + var(--miss-wallpaper-x,0%)) calc(50% + var(--miss-wallpaper-y,0%));filter:blur(80px) saturate(1.32);opacity:.34;transform:scale(calc(1.12 * var(--miss-wallpaper-zoom,1)));transition:background-image .5s ease,opacity .5s ease;pointer-events:none;z-index:0}
+#miss-panel::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 0,rgba(var(--fc-accent-rgb),.12),transparent 42%),linear-gradient(180deg,rgba(0,0,0,.22),rgba(0,0,0,.58));pointer-events:none;z-index:0}
+#miss-main{position:relative;z-index:1}
+.miss-wallpaper-video{position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);object-fit:cover;object-position:calc(50% + var(--miss-wallpaper-x,0%)) calc(50% + var(--miss-wallpaper-y,0%));transform:scale(var(--miss-wallpaper-zoom,1));filter:saturate(1.08) contrast(1.03) brightness(.78);opacity:.42;pointer-events:none;z-index:0}
+.miss-wallpaper-video[hidden]{display:none}
 #miss-panel.show{right:24px;opacity:1;pointer-events:auto;transform:translateY(0)}
 #miss-panel.miss-dragging{transition:none!important}
 #miss-panel.edge-collapsed{left:50%!important;top:0!important;right:auto!important;bottom:auto!important;width:min(260px,calc(100vw - 72px));height:38px;max-height:38px;padding:7px 12px;border-radius:0 0 16px 16px;opacity:1;pointer-events:auto;transform:translateX(-50%);cursor:pointer}
@@ -1115,7 +1118,7 @@ body.ms-playing .ms-vinyl{animation:ms-vinyl-spin 8s linear infinite}@keyframes 
 .ms-row{display:flex;align-items:flex-start;gap:8px;max-width:92%}
 .ms-row.user{align-self:flex-end;flex-direction:row-reverse}
 .ms-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font:900 10px/1 var(--font-sans);letter-spacing:.02em;text-transform:lowercase;color:#06110f;background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.72),rgba(var(--fc-accent-rgb),.94) 42%,rgba(var(--fc-accent-rgb),.58));box-shadow:0 10px 24px rgba(var(--fc-accent-rgb),.15),inset 0 1px 0 rgba(255,255,255,.42);overflow:hidden}
-.ms-avatar img{width:100%;height:100%;object-fit:cover;display:block}.ms-row.user .ms-avatar{color:#fff;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.06));box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.18)}
+.ms-avatar img,.ms-avatar video{width:100%;height:100%;object-fit:cover;object-position:calc(50% + var(--miss-avatar-x,0%)) calc(50% + var(--miss-avatar-y,0%));display:block;transform:scale(var(--miss-avatar-zoom,1));transform-origin:center}.ms-row.user .ms-avatar{color:#fff;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.06));box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.18)}
 .ms-bubble{min-width:0;max-width:100%;overflow:hidden;padding:9px 11px;border-radius:14px 14px 14px 5px;border:1px solid rgba(255,255,255,.075);background:rgba(255,255,255,.055);color:rgba(255,255,255,.86);font:500 12.5px/1.58 var(--font-sans);word-break:break-word;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
 .ms-row.user .ms-bubble{border-radius:14px 14px 5px 14px;border-color:rgba(var(--fc-accent-rgb),.25);background:rgba(var(--fc-accent-rgb),.14);color:#fff}
 .ms-bubble .miss-grid{grid-template-columns:minmax(0,1fr);max-width:100%;overflow:hidden;margin:9px 0 0;gap:7px}.ms-bubble .miss-card{align-items:flex-start;max-width:100%;min-width:0;overflow:hidden}.ms-bubble .miss-card-actions{align-self:center}
@@ -1138,7 +1141,7 @@ body.ms-playing .ms-vinyl{animation:ms-vinyl-spin 8s linear infinite}@keyframes 
 .artist-result-section{display:grid;gap:8px;padding:8px 0 4px}.artist-result-heading{font:800 11px/1 var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:rgba(244,210,138,.70);padding:0 2px}.artist-result{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);cursor:pointer}.artist-result:hover{border-color:rgba(var(--fc-accent-rgb),.32);background:rgba(var(--fc-accent-rgb),.08)}.artist-result img,.artist-result-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.07);flex:0 0 auto}.artist-result-info{min-width:0;flex:1}.artist-result-name{font:800 13px/1.25 var(--font-sans);color:rgba(255,255,255,.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist-result-meta{margin-top:4px;font-size:10.5px;color:rgba(255,255,255,.44);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist-open-btn{height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.035));color:rgba(255,255,255,.78);font:800 11px/1 var(--font-sans);cursor:pointer;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);transition:background .18s,border-color .18s,color .18s,transform .18s,box-shadow .18s}.artist-open-btn:hover{border-color:rgba(var(--fc-accent-rgb),.42);background:rgba(var(--fc-accent-rgb),.12);color:#fff;transform:translateY(-1px);box-shadow:0 10px 24px rgba(var(--fc-accent-rgb),.08),inset 0 1px 0 rgba(255,255,255,.16)}.artist-open-btn:active{transform:translateY(0) scale(.98)}
 .miss-settings{display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)}.miss-settings.show{display:block}
 .miss-field{display:grid;gap:6px;margin:9px 0}.miss-field label{font-size:10.5px;font-weight:760;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,210,138,.70)}
-.miss-key-row{display:flex;gap:7px}.miss-key-row input{flex:1}.miss-switch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.035);font-size:12px;color:rgba(255,255,255,.78)}.miss-switch input{accent-color:#f4d28a}
+.miss-key-row{display:flex;gap:7px}.miss-key-row input{flex:1}.miss-media-row{display:flex;gap:7px;align-items:center}.miss-media-row .miss-btn{flex:1}.miss-range-row{display:grid;grid-template-columns:54px minmax(0,1fr);align-items:center;gap:8px;color:rgba(255,255,255,.58);font-size:11px}.miss-range-row input[type=range]{width:100%;padding:0}.miss-switch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.035);font-size:12px;color:rgba(255,255,255,.78)}.miss-switch input{accent-color:#f4d28a}
 .ms-settings-modal{position:fixed;inset:0;z-index:1460;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.48);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 .ms-settings-modal.show{display:flex}
 .ms-settings-dialog{width:min(460px,calc(100vw - 34px));max-height:min(680px,calc(100vh - 44px));overflow:auto;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(16,17,22,.96),rgba(6,7,10,.96));box-shadow:0 32px 110px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.08);padding:18px;color:#fff;font-family:var(--font-sans)}
@@ -2052,10 +2055,14 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 <!-- 空场 Home -->
 <section id="empty-home" aria-label="Mineradio home">
   <div class="empty-home-shell home-vinyl-shell">
-    <section class="home-vinyl-left" aria-label="Music Soul 唱片播放器">
+    <section class="home-vinyl-left" aria-label="Music Soul AI DJ">
       <div class="home-ai-wallpaper-layer" aria-hidden="true"></div>
+      <video id="home-vinyl-wallpaper-video" class="home-vinyl-wallpaper-video" muted loop playsinline aria-hidden="true" hidden></video>
       <header class="home-vinyl-intro">
-        <img class="home-vinyl-avatar" src="assets/ms-ai-dj-avatar.jpg" alt="Music Soul">
+        <span class="home-vinyl-avatar-wrap">
+          <img id="home-vinyl-avatar-img" class="home-vinyl-avatar ms-avatar-media" src="assets/ms-ai-dj-avatar.jpg" alt="Music Soul">
+          <video id="home-vinyl-avatar-video" class="home-vinyl-avatar ms-avatar-media miss-avatar-video" muted loop playsinline aria-hidden="true" hidden></video>
+        </span>
         <div class="home-vinyl-intro-copy">
           <div class="home-vinyl-kicker"><i aria-hidden="true"></i> AI DJ ONLINE</div>
           <h1>Music Soul <span>MS</span></h1>
@@ -2063,35 +2070,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
         </div>
       </header>
 
-      <div id="home-vinyl-player" class="home-vinyl-player" data-playing="false">
-        <div class="home-vinyl-deck">
-          <div id="home-vinyl-tonearm" class="home-vinyl-tonearm" aria-hidden="true">
-            <i class="home-vinyl-tonearm-pivot"></i>
-            <i class="home-vinyl-tonearm-arm"></i>
-            <i class="home-vinyl-tonearm-head"></i>
-          </div>
-          <div id="home-vinyl-disc" class="home-vinyl-main-disc">
-            <div id="home-vinyl-cover" class="home-vinyl-main-cover"></div>
-            <i class="home-vinyl-hole" aria-hidden="true"></i>
-          </div>
-        </div>
-        <div class="home-vinyl-track-line">
-          <strong id="home-vinyl-title">选择一张唱片</strong>
-          <span aria-hidden="true">·</span>
-          <span id="home-vinyl-artist">Music Soul</span>
-        </div>
-        <div class="home-vinyl-controls" aria-label="主页播放器控制">
-          <button id="home-vinyl-prev" type="button" aria-label="上一首">‹</button>
-          <button id="home-vinyl-play" class="primary" type="button" aria-label="播放或暂停">▶</button>
-          <button id="home-vinyl-next" type="button" aria-label="下一首">›</button>
-          <div class="home-vinyl-volume-wrap">
-            <button id="home-vinyl-volume" type="button" aria-label="音量">◖</button>
-            <div class="home-vinyl-volume-pop" role="group" aria-label="音量控制">
-              <input id="home-vinyl-volume-slider" type="range" min="0" max="1" step="0.01" value="1" aria-label="主页音量">
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="home-vinyl-ambient" aria-hidden="true"></div>
 
       <form id="home-vinyl-chat" class="home-vinyl-chat">
         <input id="home-vinyl-chat-input" type="text" autocomplete="off" placeholder="告诉 MS 你现在想听什么…" aria-label="向 Music Soul 发送消息">
@@ -2106,7 +2085,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
       </header>
       <div id="home-vinyl-viewport" class="home-vinyl-viewport">
         <div id="home-vinyl-grid" class="home-vinyl-grid" role="listbox" aria-label="歌单歌曲唱片"></div>
-        <div id="home-vinyl-empty" class="home-vinyl-empty">从“我的歌单”选择音乐</div>
+        <div id="home-vinyl-empty" class="home-vinyl-empty" role="status" aria-live="polite">从“我的歌单”选择音乐</div>
       </div>
     </section>
   </div>
@@ -2599,7 +2578,9 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 
 <input type="file" id="file-input" accept=".mp3,.flac,.wav,.ogg,.m4a,.jpg,.jpeg,.png,.webp" multiple style="display:none">
 <input type="file" id="background-image-input" accept=".jpg,.jpeg,.png,.webp,.mp4,.webm,.mov,image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" style="display:none">
-<input type="file" id="home-ai-wallpaper-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none">
+<input type="file" id="home-ai-wallpaper-input" accept="image/*,video/*" style="display:none">
+<input type="file" id="miss-avatar-input" accept="image/*,video/*" style="display:none">
+<input type="file" id="miss-wallpaper-input" accept="image/*,video/*" style="display:none">
 <div id="drop-overlay"><div class="drop-text">拖放音乐或封面</div></div>
 <div id="free-camera-hint"><b>自由镜头</b> R 固定/退出 · WASD 移动 · 鼠标转向 · Shift 加速 · Space/Ctrl 升降 · Q/E 轻微旋转 · 滚轮景深 · K 回正</div>
 <div id="loading-overlay"><div class="spinner"></div></div>
@@ -3386,6 +3367,11 @@ var fxDefaults = {
   visualIconColor: '#ffffff',
   uiFontTheme: 'modern',
   homeAiWallpaperImage: '',
+  homeVinylWallpaperMedia: null,
+  missAvatarMedia: null,
+  missAvatarCrop: { zoom: 1, x: 0, y: 0 },
+  missChatWallpaperMedia: null,
+  missChatWallpaperCrop: { zoom: 1, x: 0, y: 0 },
   backgroundColorMode: 'cover',
   backgroundColor: '#000000',
   backgroundOpacity: 1,
@@ -3471,6 +3457,11 @@ var PACKAGED_DEFAULT_FX_SNAPSHOT = Object.freeze({
   visualIconColor: '#ffffff',
   uiFontTheme: 'modern',
   homeAiWallpaperImage: '',
+  homeVinylWallpaperMedia: null,
+  missAvatarMedia: null,
+  missAvatarCrop: { zoom: 1, x: 0, y: 0 },
+  missChatWallpaperMedia: null,
+  missChatWallpaperCrop: { zoom: 1, x: 0, y: 0 },
   backgroundColorMode: 'cover',
   backgroundColor: '#000000',
   backgroundOpacity: 1,
@@ -3543,6 +3534,7 @@ var fx = Object.assign({}, fxDefaults, readSavedLyricLayout());
 normalizeDevelopmentLockedFxState();
 applyUiFontTheme();
 applyHomeAiWallpaper();
+applyMissAvatarMedia();
 var presetTransition = { active:false, start:-10, duration:0.92, from:0, to:0 };
 var controlsAutoHide = readBooleanPreference(CONTROLS_AUTO_HIDE_STORE_KEY, false);
 var controlsHovering = false;
@@ -7755,6 +7747,11 @@ function readSavedLyricLayout() {
       visualIconColor: normalizeHexColor(raw.visualIconColor || fxDefaults.visualIconColor || '#7fd8ff', '#7fd8ff'),
       uiFontTheme: normalizeUiFontTheme(raw.uiFontTheme || fxDefaults.uiFontTheme),
       homeAiWallpaperImage: normalizeCustomBackgroundImage(raw.homeAiWallpaperImage),
+      homeVinylWallpaperMedia: normalizeHomeVinylWallpaperMedia(raw.homeVinylWallpaperMedia || raw.homeAiWallpaperImage),
+      missAvatarMedia: normalizeMissAvatarMedia(raw.missAvatarMedia),
+      missAvatarCrop: normalizeMissCrop(raw.missAvatarCrop),
+      missChatWallpaperMedia: normalizeMissChatWallpaperMedia(raw.missChatWallpaperMedia),
+      missChatWallpaperCrop: normalizeMissCrop(raw.missChatWallpaperCrop),
       backgroundColorMode: savedBgCustom ? 'custom' : 'cover',
       backgroundColor: savedBgColor,
       backgroundOpacity: savedBgOpacity,
@@ -7847,6 +7844,11 @@ function saveLyricLayout() {
       visualIconColor: normalizeHexColor(fx.visualIconColor || '#7fd8ff', '#7fd8ff'),
       uiFontTheme: normalizeUiFontTheme(fx.uiFontTheme || fxDefaults.uiFontTheme),
       homeAiWallpaperImage: normalizeCustomBackgroundImage(fx.homeAiWallpaperImage),
+      homeVinylWallpaperMedia: normalizeHomeVinylWallpaperMedia(fx.homeVinylWallpaperMedia || fx.homeAiWallpaperImage),
+      missAvatarMedia: normalizeMissAvatarMedia(fx.missAvatarMedia),
+      missAvatarCrop: normalizeMissCrop(fx.missAvatarCrop),
+      missChatWallpaperMedia: normalizeMissChatWallpaperMedia(fx.missChatWallpaperMedia),
+      missChatWallpaperCrop: normalizeMissCrop(fx.missChatWallpaperCrop),
       backgroundColorMode: fx.backgroundColorMode === 'custom' || fx.backgroundColorCustom ? 'custom' : 'cover',
       backgroundColor: normalizeHexColor(fx.backgroundColor || '#000000', '#000000'),
       backgroundOpacity: clampRange(fx.backgroundOpacity == null ? fxDefaults.backgroundOpacity : Number(fx.backgroundOpacity), 0, 1),
@@ -15997,18 +15999,6 @@ function createVinylHomeAdapter() {
         return true;
       });
     },
-    togglePlay: function() {
-      return togglePlay();
-    },
-    previous: function() {
-      return prevTrack();
-    },
-    next: function() {
-      return nextTrack();
-    },
-    setVolume: function(value) {
-      setVolume(value, true);
-    },
     submitChat: function(text) {
       if (!text) {
         openHomeAiDjPanel();
@@ -16025,8 +16015,6 @@ function createVinylHomeAdapter() {
 function initVinylHome() {
   if (!window.MineradioVinylHome) return;
   window.MineradioVinylHome.mount(createVinylHomeAdapter());
-  var slider = document.getElementById('home-vinyl-volume-slider');
-  if (slider) slider.value = targetVolume;
   if (vinylPlaylistCandidates.length) window.MineradioVinylHome.setPlaylist(vinylPlaylistMeta, vinylPlaylistCandidates);
   syncVinylHomeTrack();
 }
@@ -16670,7 +16658,10 @@ function isPointNearHomeContent(x, y) {
   var selectors = [
     '.home-card',
     '.home-tile',
-    '.home-chip'
+    '.home-chip',
+    '.home-vinyl-left',
+    '.home-vinyl-right',
+    '.home-vinyl-disc'
   ];
   for (var i = 0; i < selectors.length; i++) {
     var nodes = document.querySelectorAll(selectors[i]);
@@ -16708,6 +16699,10 @@ function isHomeBlankDismissClick(e) {
     '#toast',
     '#trial-banner',
     '#source-fallback-notice',
+    '.home-vinyl-shell',
+    '.home-vinyl-left',
+    '.home-vinyl-right',
+    '.home-vinyl-viewport',
     '.modal-mask',
     '.modal',
     '.track-detail-modal',
@@ -17580,7 +17575,10 @@ async function toggleLikeSong(song) {
     refreshSearchResultActionStates();
   }
 }
-function toggleLikeCurrent() { toggleLikeSong(currentCoverSong()); }
+function toggleLikeCurrent() {
+  toggleLikeSong(currentCoverSong());
+  scheduleDesktopShellStatePush(true);
+}
 function toggleLikeSearchResult(i) { if (playlist[i]) toggleLikeSong(playlist[i]); }
 function toggleLikeQueueIndex(i) { if (playQueue[i]) toggleLikeSong(playQueue[i]); }
 function toggleLikeDetailSong(song) { toggleLikeSong(song); }
@@ -17788,8 +17786,229 @@ function missUserAvatarHtml() {
     return '<img src="' + escHtml(providerAvatarSrc('netease', {})) + '" alt="">';
   }
 }
+function normalizeMissCrop(raw) {
+  raw = raw && typeof raw === 'object' ? raw : {};
+  var zoom = Number(raw.zoom);
+  var x = Number(raw.x);
+  var y = Number(raw.y);
+  return {
+    zoom: clampRange(isFinite(zoom) ? zoom : 1, 1, 3),
+    x: clampRange(isFinite(x) ? x : 0, -50, 50),
+    y: clampRange(isFinite(y) ? y : 0, -50, 50),
+  };
+}
+function normalizeMissMedia(raw) {
+  if (!raw) return null;
+  if (typeof raw === 'string') {
+    if (/^data:video\/(mp4|webm|quicktime);base64,/i.test(raw) || /^https?:\/\//i.test(raw)) return { type: 'video', src: String(raw) };
+    var image = normalizeCustomBackgroundImage(raw);
+    return image ? { type: 'image', src: image } : null;
+  }
+  if (typeof raw !== 'object') return null;
+  var type = raw.type === 'video' ? 'video' : 'image';
+  var src = String(raw.src || raw.url || '').trim();
+  if (!src) return null;
+  if (type === 'video') {
+    if (!/^data:video\/(mp4|webm|quicktime);base64,/i.test(src) && !/^https?:\/\//i.test(src)) return null;
+    return { type: 'video', src: src, name: String(raw.name || '').slice(0, 120) };
+  }
+  var imageSrc = normalizeCustomBackgroundImage(src);
+  return imageSrc ? { type: 'image', src: imageSrc, name: String(raw.name || '').slice(0, 120) } : null;
+}
+function normalizeMissAvatarMedia(raw) {
+  return normalizeMissMedia(raw);
+}
+function normalizeMissChatWallpaperMedia(raw) {
+  return normalizeMissMedia(raw);
+}
+function missMediaHtml(media, fallback, alt) {
+  media = normalizeMissMedia(media);
+  if (media && media.type === 'video') {
+    return '<video class="ms-avatar-media miss-avatar-video" src="' + escHtml(media.src) + '" muted loop playsinline autoplay aria-label="' + escHtml(alt || '') + '"></video>';
+  }
+  return '<img class="ms-avatar-media" src="' + escHtml((media && media.src) || fallback) + '" alt="' + escHtml(alt || '') + '">';
+}
 function missAssistantAvatarHtml() {
-  return '<img src="' + escHtml(MISS_AI_DJ_AVATAR_SRC) + '" alt="Music Soul">';
+  return missMediaHtml(fx && fx.missAvatarMedia, MISS_AI_DJ_AVATAR_SRC, 'Music Soul');
+}
+function applyMissCropVars(prefix, crop) {
+  crop = normalizeMissCrop(crop);
+  var root = document.documentElement;
+  root.style.setProperty('--' + prefix + '-zoom', String(crop.zoom));
+  root.style.setProperty('--' + prefix + '-x', crop.x + '%');
+  root.style.setProperty('--' + prefix + '-y', crop.y + '%');
+}
+function playInlineVideo(video, src) {
+  if (!video) return;
+  if (src) {
+    if (video.src !== src) video.src = src;
+    video.hidden = false;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    var play = video.play && video.play();
+    if (play && play.catch) play.catch(function(){});
+  } else {
+    try { video.pause(); } catch (e) {}
+    video.removeAttribute('src');
+    video.hidden = true;
+  }
+}
+function applyMissAvatarMedia() {
+  var media = normalizeMissAvatarMedia(fx && fx.missAvatarMedia);
+  var crop = normalizeMissCrop(fx && fx.missAvatarCrop);
+  applyMissCropVars('miss-avatar', crop);
+  var html = missAssistantAvatarHtml();
+  var fab = document.getElementById('miss-fab');
+  if (fab) fab.innerHTML = html;
+  var homeImg = document.getElementById('home-vinyl-avatar-img');
+  var homeVideo = document.getElementById('home-vinyl-avatar-video');
+  if (media && media.type === 'video') {
+    if (homeImg) homeImg.hidden = true;
+    playInlineVideo(homeVideo, media.src);
+  } else {
+    if (homeImg) {
+      homeImg.src = (media && media.src) || MISS_AI_DJ_AVATAR_SRC;
+      homeImg.hidden = false;
+    }
+    playInlineVideo(homeVideo, '');
+  }
+}
+function refreshMissAvatarMessages() {
+  var box = document.getElementById('ms-messages');
+  if (box && box.children.length) renderMsMessages();
+}
+function syncMissChatWallpaperVideo(media) {
+  media = normalizeMissChatWallpaperMedia(media);
+  playInlineVideo(document.getElementById('miss-wallpaper-video'), media && media.type === 'video' ? media.src : '');
+}
+function applyMissChatWallpaperMedia() {
+  applyMissCropVars('miss-wallpaper', fx && fx.missChatWallpaperCrop);
+  updateMissCoverBackground();
+}
+function setMissAvatarCrop(key, value, silent) {
+  fx.missAvatarCrop = normalizeMissCrop(fx.missAvatarCrop);
+  if (key === 'zoom') fx.missAvatarCrop.zoom = clampRange(Number(value) || 1, 1, 3);
+  if (key === 'x') fx.missAvatarCrop.x = clampRange(Number(value) || 0, -50, 50);
+  if (key === 'y') fx.missAvatarCrop.y = clampRange(Number(value) || 0, -50, 50);
+  applyMissAvatarMedia();
+  updateMissMediaControls();
+  if (!silent) saveLyricLayout();
+}
+function setMissWallpaperCrop(key, value, silent) {
+  fx.missChatWallpaperCrop = normalizeMissCrop(fx.missChatWallpaperCrop);
+  if (key === 'zoom') fx.missChatWallpaperCrop.zoom = clampRange(Number(value) || 1, 1, 3);
+  if (key === 'x') fx.missChatWallpaperCrop.x = clampRange(Number(value) || 0, -50, 50);
+  if (key === 'y') fx.missChatWallpaperCrop.y = clampRange(Number(value) || 0, -50, 50);
+  applyMissChatWallpaperMedia();
+  updateMissMediaControls();
+  if (!silent) saveLyricLayout();
+}
+function updateMissMediaControls() {
+  var avatar = normalizeMissCrop(fx && fx.missAvatarCrop);
+  var wallpaper = normalizeMissCrop(fx && fx.missChatWallpaperCrop);
+  [['miss-avatar-zoom', avatar.zoom], ['miss-avatar-x', avatar.x], ['miss-avatar-y', avatar.y], ['miss-wallpaper-zoom', wallpaper.zoom], ['miss-wallpaper-x', wallpaper.x], ['miss-wallpaper-y', wallpaper.y]].forEach(function(pair){
+    var el = document.getElementById(pair[0]);
+    if (el) el.value = String(pair[1]);
+  });
+  var avatarLabel = document.getElementById('miss-avatar-value');
+  var wallpaperLabel = document.getElementById('miss-wallpaper-value');
+  var avatarMedia = normalizeMissAvatarMedia(fx && fx.missAvatarMedia);
+  var wallpaperMedia = normalizeMissChatWallpaperMedia(fx && fx.missChatWallpaperMedia);
+  if (avatarLabel) avatarLabel.textContent = avatarMedia ? (avatarMedia.type === 'video' ? '自定义视频' : '自定义图片') : '默认头像';
+  if (wallpaperLabel) wallpaperLabel.textContent = wallpaperMedia ? (wallpaperMedia.type === 'video' ? '自定义视频' : '自定义图片') : '跟随歌曲封面';
+}
+function resizeImageDataUrl(src, maxSide, done) {
+  var img = new Image();
+  img.onload = function() {
+    var iw = img.naturalWidth || img.width || 1;
+    var ih = img.naturalHeight || img.height || 1;
+    var scale = Math.min(1, maxSide / Math.max(iw, ih));
+    var w = Math.max(1, Math.round(iw * scale));
+    var h = Math.max(1, Math.round(ih * scale));
+    var cv = document.createElement('canvas');
+    cv.width = w; cv.height = h;
+    var cx = cv.getContext('2d');
+    cx.drawImage(img, 0, 0, w, h);
+    var out = '';
+    try { out = cv.toDataURL('image/webp', 0.84); } catch (err) {}
+    if (!/^data:image\/webp/i.test(out)) {
+      try { out = cv.toDataURL('image/jpeg', 0.86); } catch (err2) { out = src; }
+    }
+    done(out);
+  };
+  img.onerror = function(){ done(src); };
+  img.src = src;
+}
+function readMissMediaFile(file, target) {
+  if (!file || (!/^image\//i.test(file.type || '') && !/^video\//i.test(file.type || ''))) {
+    showToast('请选择图片或视频文件');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var src = String(e.target.result || '');
+    if (/^video\//i.test(file.type || '')) {
+      if (target === 'avatar') {
+        fx.missAvatarMedia = normalizeMissAvatarMedia({ type: 'video', src: src, name: file.name || '' });
+        applyMissAvatarMedia();
+        refreshMissAvatarMessages();
+      } else {
+        fx.missChatWallpaperMedia = normalizeMissChatWallpaperMedia({ type: 'video', src: src, name: file.name || '' });
+        applyMissChatWallpaperMedia();
+      }
+      updateMissMediaControls();
+      saveLyricLayout();
+      showToast(target === 'avatar' ? 'AI DJ 视频头像已应用' : '聊天框视频壁纸已应用');
+      return;
+    }
+    resizeImageDataUrl(src, target === 'avatar' ? 900 : 1800, function(out){
+      if (target === 'avatar') {
+        fx.missAvatarMedia = normalizeMissAvatarMedia({ type: 'image', src: out, name: file.name || '' });
+        applyMissAvatarMedia();
+        refreshMissAvatarMessages();
+      } else {
+        fx.missChatWallpaperMedia = normalizeMissChatWallpaperMedia({ type: 'image', src: out, name: file.name || '' });
+        applyMissChatWallpaperMedia();
+      }
+      updateMissMediaControls();
+      saveLyricLayout();
+      showToast(target === 'avatar' ? 'AI DJ 图片头像已应用' : '聊天框图片壁纸已应用');
+    });
+  };
+  reader.onerror = function(){ showToast('文件读取失败'); };
+  reader.readAsDataURL(file);
+}
+function readMissAvatarMediaFile(file) {
+  readMissMediaFile(file, 'avatar');
+}
+function readMissChatWallpaperFile(file) {
+  readMissMediaFile(file, 'wallpaper');
+}
+function chooseMissAvatarMedia() {
+  var input = document.getElementById('miss-avatar-input');
+  if (input) input.click();
+}
+function chooseMissChatWallpaperMedia() {
+  var input = document.getElementById('miss-wallpaper-input');
+  if (input) input.click();
+}
+function clearMissAvatarMedia() {
+  fx.missAvatarMedia = null;
+  fx.missAvatarCrop = { zoom: 1, x: 0, y: 0 };
+  applyMissAvatarMedia();
+  refreshMissAvatarMessages();
+  updateMissMediaControls();
+  saveLyricLayout();
+  showToast('AI DJ 头像已恢复默认');
+}
+function clearMissChatWallpaperMedia() {
+  fx.missChatWallpaperMedia = null;
+  fx.missChatWallpaperCrop = { zoom: 1, x: 0, y: 0 };
+  applyMissChatWallpaperMedia();
+  updateMissMediaControls();
+  saveLyricLayout();
+  showToast('聊天框壁纸已恢复跟随封面');
 }
 function updateMissNowPlaying() {
   var song = missCurrentSong();
@@ -17804,16 +18023,19 @@ function updateMissNowPlaying() {
 function updateMissCoverBackground() {
   var panel = document.getElementById('miss-panel');
   if (!panel) return;
-  var src = missCoverSrc(missCurrentSong(), 420);
+  var wallpaperMedia = normalizeMissChatWallpaperMedia(fx && fx.missChatWallpaperMedia);
+  syncMissChatWallpaperVideo(wallpaperMedia);
+  var customImage = wallpaperMedia && wallpaperMedia.type === 'image' ? wallpaperMedia.src : '';
+  var src = customImage || (wallpaperMedia && wallpaperMedia.type === 'video' ? '' : missCoverSrc(missCurrentSong(), 420));
   var vinylSrc = src || MISS_AI_DJ_AVATAR_SRC;
   if (src && src !== missState.coverBg) {
     missState.coverBg = src;
-    panel.style.setProperty('--ms-cover-bg', 'url("' + src.replace(/"/g, '%22') + '")');
+    panel.style.setProperty('--ms-cover-bg', 'url("' + cssImageUrl(src) + '")');
   } else if (!src && missState.coverBg) {
     missState.coverBg = '';
     panel.style.setProperty('--ms-cover-bg', 'none');
   }
-  panel.style.setProperty('--ms-vinyl-cover', 'url("' + vinylSrc.replace(/"/g, '%22') + '")');
+  panel.style.setProperty('--ms-vinyl-cover', 'url("' + cssImageUrl(vinylSrc) + '")');
   updateMissNowPlaying();
 }
 function scrollMsMessagesToBottom() {
@@ -17901,18 +18123,21 @@ function mountMusicSoulUi() {
   if (panel && !panel.dataset.msMounted) {
     panel.dataset.msMounted = '1';
     panel.setAttribute('aria-label', 'Music Soul');
-    panel.innerHTML = '<div class="miss-head" id="miss-panel-head"><div class="miss-brand"><div class="ms-vinyl" aria-hidden="true"></div><div class="miss-copy"><div class="miss-title">Music Soul</div><div class="miss-sub">MS · 音乐搭子</div><div id="ms-now-playing" class="ms-now-playing">还没有播放歌曲</div></div></div><div class="miss-actions"><button class="miss-btn ms-round-btn" type="button" onclick="openMissSettings()" title="设置" aria-label="设置"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.08 1.65V21a2 2 0 0 1-4 0v-.09A1.8 1.8 0 0 0 8.8 19.26a1.8 1.8 0 0 0-1.98.36l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.8 1.8 0 0 0 4.35 15a1.8 1.8 0 0 0-1.65-1.08H2.6a2 2 0 0 1 0-4h.09A1.8 1.8 0 0 0 4.35 8.8a1.8 1.8 0 0 0-.36-1.98l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.8 1.8 0 0 0 1.98.36h.01A1.8 1.8 0 0 0 9.89 2.7V2.6a2 2 0 0 1 4 0v.09a1.8 1.8 0 0 0 1.08 1.65 1.8 1.8 0 0 0 1.98-.36l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.8 1.8 0 0 0-.36 1.98v.01a1.8 1.8 0 0 0 1.65 1.08h.09a2 2 0 0 1 0 4h-.09A1.8 1.8 0 0 0 19.4 15Z"/></svg></button><button class="miss-btn ms-round-btn" type="button" onclick="closeMissPanel()" title="关闭" aria-label="关闭">×</button></div></div><div id="miss-status" class="miss-status">正在唤醒 Music Soul...</div><div id="miss-main"><div class="ms-chat-shell"><div id="ms-messages" class="ms-messages" aria-live="polite"></div><div class="ms-input-wrap"><div id="ms-menu-pop" class="ms-menu-pop"><button class="miss-btn" type="button" onclick="askMissRecommend()">按当前状态推荐</button><button class="miss-btn" type="button" onclick="askMissSmartContinue()">智能续播</button><button class="miss-btn" type="button" onclick="missUsePrompt(&quot;深夜独处，想听一点安静但不太悲伤的歌&quot;)">深夜独处</button><button class="miss-btn" type="button" onclick="missUsePrompt(&quot;通勤路上想提神，推荐几首有律动的歌&quot;)">通勤提神</button><button class="miss-btn" type="button" onclick="missUsePrompt(&quot;学习专注，想要不打扰思路的音乐&quot;)">学习专注</button></div><div class="miss-chat-row"><button id="ms-menu-toggle" class="miss-btn ms-round-btn" type="button" onclick="toggleMissMenu()" title="更多音乐动作" aria-label="更多音乐动作">+</button><input id="miss-input" type="text" placeholder="和 MS 说说你想听的歌、心情或当前这首歌曲..."><button id="miss-send" class="miss-btn primary ms-round-btn ms-send-btn" type="button" onclick="sendMissChat()" title="发送" aria-label="发送"><svg fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13"/><path d="m13 6 6 6-6 6"/></svg></button></div></div></div></div>';
+    panel.innerHTML = '<video id="miss-wallpaper-video" class="miss-wallpaper-video" muted loop playsinline aria-hidden="true" hidden></video><div class="miss-head" id="miss-panel-head"><div class="miss-brand"><div class="ms-vinyl" aria-hidden="true"></div><div class="miss-copy"><div class="miss-title">Music Soul</div><div class="miss-sub">MS · 音乐搭子</div><div id="ms-now-playing" class="ms-now-playing">还没有播放歌曲</div></div></div><div class="miss-actions"><button class="miss-btn ms-round-btn" type="button" onclick="openMissSettings()" title="设置" aria-label="设置"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.08 1.65V21a2 2 0 0 1-4 0v-.09A1.8 1.8 0 0 0 8.8 19.26a1.8 1.8 0 0 0-1.98.36l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.8 1.8 0 0 0 4.35 15a1.8 1.8 0 0 0-1.65-1.08H2.6a2 2 0 0 1 0-4h.09A1.8 1.8 0 0 0 4.35 8.8a1.8 1.8 0 0 0-.36-1.98l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.8 1.8 0 0 0 1.98.36h.01A1.8 1.8 0 0 0 9.89 2.7V2.6a2 2 0 0 1 4 0v.09a1.8 1.8 0 0 0 1.08 1.65 1.8 1.8 0 0 0 1.98-.36l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.8 1.8 0 0 0-.36 1.98v.01a1.8 1.8 0 0 0 1.65 1.08h.09a2 2 0 0 1 0 4h-.09A1.8 1.8 0 0 0 19.4 15Z"/></svg></button><button class="miss-btn ms-round-btn" type="button" onclick="closeMissPanel()" title="关闭" aria-label="关闭">×</button></div></div><div id="miss-status" class="miss-status">正在唤醒 Music Soul...</div><div id="miss-main"><div class="ms-chat-shell"><div id="ms-messages" class="ms-messages" aria-live="polite"></div><div class="ms-input-wrap"><div id="ms-menu-pop" class="ms-menu-pop"><button class="miss-btn" type="button" onclick="askMissRecommend()">按当前状态推荐</button><button class="miss-btn" type="button" onclick="askMissSmartContinue()">智能续播</button><button class="miss-btn" type="button" onclick="missUsePrompt(&quot;深夜独处，想听一点安静但不太悲伤的歌&quot;)">深夜独处</button><button class="miss-btn" type="button" onclick="missUsePrompt(&quot;通勤路上想提神，推荐几首有律动的歌&quot;)">通勤提神</button><button class="miss-btn" type="button" onclick="missUsePrompt(&quot;学习专注，想要不打扰思路的音乐&quot;)">学习专注</button></div><div class="miss-chat-row"><button id="ms-menu-toggle" class="miss-btn ms-round-btn" type="button" onclick="toggleMissMenu()" title="更多音乐动作" aria-label="更多音乐动作">+</button><input id="miss-input" type="text" placeholder="和 MS 说说你想听的歌、心情或当前这首歌曲..."><button id="miss-send" class="miss-btn primary ms-round-btn ms-send-btn" type="button" onclick="sendMissChat()" title="发送" aria-label="发送"><svg fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13"/><path d="m13 6 6 6-6 6"/></svg></button></div></div></div></div>';
   }
   if (!document.getElementById('ms-settings-modal')) {
     var modal = document.createElement('div');
     modal.id = 'ms-settings-modal';
     modal.className = 'ms-settings-modal';
     modal.setAttribute('aria-hidden', 'true');
-    modal.innerHTML = '<div class="ms-settings-dialog" role="dialog" aria-modal="true" aria-label="Music Soul 设置"><div class="miss-head"><div><div class="miss-title">Music Soul 设置</div><div class="miss-sub">MiMo API · 仅保存在本地</div></div><button class="miss-btn" type="button" onclick="closeMissSettings()">关闭</button></div><div id="miss-settings" class="miss-settings show"><div class="miss-switch"><span>启用 Music Soul</span><input id="miss-enabled" type="checkbox"></div><div class="miss-field"><label>API Key</label><div class="miss-key-row"><input id="miss-api-key" type="password" placeholder="输入你的小米 MiMo API Key"><button class="miss-btn" type="button" onclick="toggleMissApiKeyVisible()">显示</button></div><div id="miss-key-meta" class="miss-status"></div></div><div class="miss-field"><label>API 地址</label><input id="miss-base-url" type="text" value="https://api.xiaomimimo.com/v1"></div><div class="miss-field"><label>模型名称</label><input id="miss-model" type="text" value="mimo-v2.5-pro"></div><div class="miss-field"><label>鉴权方式</label><select id="miss-auth-method"><option value="api-key">api-key</option><option value="bearer">bearer</option></select></div><div class="miss-grid"><button class="miss-btn primary" type="button" onclick="saveMissSettings()">保存</button><button class="miss-btn" type="button" onclick="testMissConnection()">测试连接</button><button class="miss-btn danger" type="button" onclick="clearMissSettings()">清空 AI 设置</button><button class="miss-btn" type="button" onclick="closeMissSettings()">取消</button></div></div></div>';
+    modal.innerHTML = '<div class="ms-settings-dialog" role="dialog" aria-modal="true" aria-label="Music Soul 设置"><div class="miss-head"><div><div class="miss-title">Music Soul 设置</div><div class="miss-sub">MiMo API · 仅保存在本地</div></div><button class="miss-btn" type="button" onclick="closeMissSettings()">关闭</button></div><div id="miss-settings" class="miss-settings show"><div class="miss-switch"><span>启用 Music Soul</span><input id="miss-enabled" type="checkbox"></div><div class="miss-field"><label>API Key</label><div class="miss-key-row"><input id="miss-api-key" type="password" placeholder="输入你的小米 MiMo API Key"><button class="miss-btn" type="button" onclick="toggleMissApiKeyVisible()">显示</button></div><div id="miss-key-meta" class="miss-status"></div></div><div class="miss-field"><label>API 地址</label><input id="miss-base-url" type="text" value="https://api.xiaomimimo.com/v1"></div><div class="miss-field"><label>模型名称</label><input id="miss-model" type="text" value="mimo-v2.5-pro"></div><div class="miss-field"><label>鉴权方式</label><select id="miss-auth-method"><option value="api-key">api-key</option><option value="bearer">bearer</option></select></div><div class="miss-field"><label>AI DJ 头像 <span id="miss-avatar-value">默认头像</span></label><div class="miss-media-row"><button class="miss-btn" type="button" onclick="chooseMissAvatarMedia()">选择图片/视频</button><button class="miss-btn" type="button" onclick="clearMissAvatarMedia()">恢复默认</button></div><div class="miss-range-row"><span>缩放</span><input id="miss-avatar-zoom" type="range" min="1" max="3" step="0.01" oninput="setMissAvatarCrop(&quot;zoom&quot;,this.value)"></div><div class="miss-range-row"><span>横移</span><input id="miss-avatar-x" type="range" min="-50" max="50" step="1" oninput="setMissAvatarCrop(&quot;x&quot;,this.value)"></div><div class="miss-range-row"><span>纵移</span><input id="miss-avatar-y" type="range" min="-50" max="50" step="1" oninput="setMissAvatarCrop(&quot;y&quot;,this.value)"></div></div><div class="miss-field"><label>聊天框壁纸 <span id="miss-wallpaper-value">跟随歌曲封面</span></label><div class="miss-media-row"><button class="miss-btn" type="button" onclick="chooseMissChatWallpaperMedia()">选择图片/视频</button><button class="miss-btn" type="button" onclick="clearMissChatWallpaperMedia()">恢复默认</button></div><div class="miss-range-row"><span>缩放</span><input id="miss-wallpaper-zoom" type="range" min="1" max="3" step="0.01" oninput="setMissWallpaperCrop(&quot;zoom&quot;,this.value)"></div><div class="miss-range-row"><span>横移</span><input id="miss-wallpaper-x" type="range" min="-50" max="50" step="1" oninput="setMissWallpaperCrop(&quot;x&quot;,this.value)"></div><div class="miss-range-row"><span>纵移</span><input id="miss-wallpaper-y" type="range" min="-50" max="50" step="1" oninput="setMissWallpaperCrop(&quot;y&quot;,this.value)"></div></div><div class="miss-grid"><button class="miss-btn primary" type="button" onclick="saveMissSettings()">保存</button><button class="miss-btn" type="button" onclick="testMissConnection()">测试连接</button><button class="miss-btn danger" type="button" onclick="clearMissSettings()">清空 AI 设置</button><button class="miss-btn" type="button" onclick="closeMissSettings()">取消</button></div></div></div>';
     modal.addEventListener('click', function(e){ if (e.target === modal) closeMissSettings(); });
     document.body.appendChild(modal);
   }
   ensureMissWelcome();
+  applyMissAvatarMedia();
+  applyMissChatWallpaperMedia();
+  updateMissMediaControls();
   updateMissBusyUi();
   updateMissCoverBackground();
   syncMissEntryVisibility();
@@ -18375,6 +18600,7 @@ function openMissSettings() {
     el.classList.add('show');
     el.setAttribute('aria-hidden', 'false');
   }
+  updateMissMediaControls();
   loadMissConfig();
 }
 function openHomeAiDjPanel() {
@@ -18756,6 +18982,12 @@ window.openHomeAiDjPanel = openHomeAiDjPanel;
 window.openHomeAiDjSettings = openHomeAiDjSettings;
 window.openHomeAiDjSmartContinue = openHomeAiDjSmartContinue;
 window.toggleMissApiKeyVisible = toggleMissApiKeyVisible;
+window.chooseMissAvatarMedia = chooseMissAvatarMedia;
+window.chooseMissChatWallpaperMedia = chooseMissChatWallpaperMedia;
+window.clearMissAvatarMedia = clearMissAvatarMedia;
+window.clearMissChatWallpaperMedia = clearMissChatWallpaperMedia;
+window.setMissAvatarCrop = setMissAvatarCrop;
+window.setMissWallpaperCrop = setMissWallpaperCrop;
 window.toggleMissMenu = toggleMissMenu;
 window.saveMissSettings = saveMissSettings;
 window.clearMissSettings = clearMissSettings;
@@ -19622,8 +19854,6 @@ function updateVolumeUi() {
         ? '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15 10.5a2 2 0 0 1 0 3"/>'
         : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15 9.5a4 4 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/>';
   }
-  var homeSlider = document.getElementById('home-vinyl-volume-slider');
-  if (homeSlider && Math.abs(parseFloat(homeSlider.value) - targetVolume) > 0.001) homeSlider.value = targetVolume;
 }
 
 function setVolume(value, silent) {
@@ -19996,9 +20226,10 @@ function syncPlaybackStateFromAudioEvent(reason) {
   playing = isPlaying;
   setPlayIcon(isPlaying);
   if (!isPlaying) hideLoading();
-  if (reason === 'play' || reason === 'playing') switchPlaybackVisualToEmily();
+  if ((reason === 'play' || reason === 'playing') && !vinylHomePlaybackSession) switchPlaybackVisualToEmily();
   forcePlaybackControlsInteractive();
   if (window.MineradioVinylHome) window.MineradioVinylHome.syncPlayback(isPlaying);
+  scheduleDesktopShellStatePush(false);
 }
 
 function isPlaybackRecursionError(err) {
@@ -20059,6 +20290,7 @@ async function playQueueAt(idx, opts) {
     homeSuppressed = false;
   }
   currentIdx = idx;
+  scheduleDesktopShellStatePush(true);
   trackSwitchToken++;
   markPlayPhase('cancel-previous-track');
   cancelBeatAnalysisTimer();
@@ -20079,7 +20311,7 @@ async function playQueueAt(idx, opts) {
   var bmKey = safePlaybackStep('beatmap-key', function(){ return beatMapSongKey(song); }) || '';
   var podcastDjMode = !!safePlaybackStep('podcast-mode', function(){ return isPodcastSong(song); });
   safePlaybackStep('dj-mode', function(){ setDjModeActive(podcastDjMode, song); });
-  safePlaybackStep('visual-switch', switchPlaybackVisualToEmily);
+  if (!opts.preserveHomeState) safePlaybackStep('visual-switch', switchPlaybackVisualToEmily);
   currentLocalSong = null;
   safePlaybackStep('cover-button', updateCustomCoverButton);
   safePlaybackStep('like-buttons', function(){ updateLikeButtons(song); });
@@ -20307,7 +20539,7 @@ async function attemptAudioPlay(opts) {
         await audio.play();
       }
       await resumeAudioAnalysis();
-      switchPlaybackVisualToEmily();
+      if (!vinylHomePlaybackSession) switchPlaybackVisualToEmily();
       playing = true; setPlayIcon(true);
     if (opts.fade !== false) startPlaybackFadeIn();
     else restorePlaybackGain();
@@ -20365,6 +20597,7 @@ function setPlayIcon(p) {
   document.getElementById('play-icon').innerHTML = p
     ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
     : '<path d="M8 5v14l11-7z"/>';
+  scheduleDesktopShellStatePush(false);
 }
 function nextTrack() {
   if (!playQueue.length) return;
@@ -20435,6 +20668,7 @@ function updatePlayModeButton(animate) {
     btn.classList.toggle('active', playMode !== 'loop');
   }
   if (icon) icon.innerHTML = playModeIconMarkup(playMode);
+  scheduleDesktopShellStatePush(true);
   if (!animate || !btn) return;
   if (window.gsap) {
     window.gsap.killTweensOf(btn);
@@ -22029,6 +22263,7 @@ function normalizeFxArchiveSnapshot(raw) {
     visualIconColor: normalizeHexColor(raw.visualIconColor || fxDefaults.visualIconColor, fxDefaults.visualIconColor),
     uiFontTheme: normalizeUiFontTheme(raw.uiFontTheme || fxDefaults.uiFontTheme),
     homeAiWallpaperImage: normalizeCustomBackgroundImage(raw.homeAiWallpaperImage),
+    homeVinylWallpaperMedia: normalizeHomeVinylWallpaperMedia(raw.homeVinylWallpaperMedia || raw.homeAiWallpaperImage),
     backgroundColorMode: raw.backgroundColorMode === 'custom' || raw.backgroundColorCustom ? 'custom' : 'cover',
     backgroundColor: normalizeHexColor(raw.backgroundColor || fxDefaults.backgroundColor, fxDefaults.backgroundColor),
     backgroundOpacity: archiveNumber(raw, 'backgroundOpacity', fxDefaults.backgroundOpacity, 0, 1),
@@ -22617,34 +22852,88 @@ function setUiFontTheme(theme, silent) {
   saveLyricLayout();
   if (!silent) showToast('界面字体已切换');
 }
+function normalizeHomeVinylWallpaperMedia(raw) {
+  if (!raw) return null;
+  if (typeof raw === 'string') {
+    var image = normalizeCustomBackgroundImage(raw);
+    if (image) return { type: 'image', src: image };
+    if (/^data:video\/(mp4|webm|quicktime);base64,/i.test(raw) || /^https?:\/\//i.test(raw)) return { type: 'video', src: String(raw) };
+    return null;
+  }
+  if (typeof raw !== 'object') return null;
+  var type = raw.type === 'video' ? 'video' : 'image';
+  var src = String(raw.src || raw.url || '').trim();
+  if (!src) return null;
+  if (type === 'video') {
+    if (!/^data:video\/(mp4|webm|quicktime);base64,/i.test(src) && !/^https?:\/\//i.test(src)) return null;
+    return { type: 'video', src: src, name: String(raw.name || '').slice(0, 120) };
+  }
+  var imageSrc = normalizeCustomBackgroundImage(src);
+  return imageSrc ? { type: 'image', src: imageSrc, name: String(raw.name || '').slice(0, 120) } : null;
+}
+function syncHomeVinylWallpaperVideo(media) {
+  var video = document.getElementById('home-vinyl-wallpaper-video');
+  if (!video) return;
+  if (media && media.type === 'video' && media.src) {
+    if (video.src !== media.src) video.src = media.src;
+    video.hidden = false;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    var play = video.play && video.play();
+    if (play && play.catch) play.catch(function(){});
+  } else {
+    try { video.pause(); } catch (e) {}
+    video.removeAttribute('src');
+    video.hidden = true;
+  }
+}
 function applyHomeAiWallpaper() {
-  var image = normalizeCustomBackgroundImage((fx && fx.homeAiWallpaperImage) || '');
+  var media = normalizeHomeVinylWallpaperMedia((fx && (fx.homeVinylWallpaperMedia || fx.homeAiWallpaperImage)) || null);
+  var image = media && media.type === 'image' ? media.src : '';
   var root = document.documentElement;
   root.style.setProperty('--home-ai-wallpaper-image', image ? 'url("' + cssImageUrl(image) + '")' : 'none');
   root.style.setProperty('--home-ai-wallpaper-opacity', image ? '0.58' : '0');
-  document.body.classList.toggle('home-ai-wallpaper-custom', !!image);
+  document.body.classList.toggle('home-ai-wallpaper-custom', !!media);
+  syncHomeVinylWallpaperVideo(media);
 }
 function updateHomeAiWallpaperControls() {
   applyHomeAiWallpaper();
+  var media = normalizeHomeVinylWallpaperMedia((fx && (fx.homeVinylWallpaperMedia || fx.homeAiWallpaperImage)) || null);
   var label = document.getElementById('home-ai-wallpaper-value');
-  if (label) label.textContent = normalizeCustomBackgroundImage(fx.homeAiWallpaperImage) ? '自定义图片' : '跟随默认';
+  if (label) label.textContent = media ? (media.type === 'video' ? '自定义视频' : '自定义图片') : '跟随默认';
 }
 function setHomeAiWallpaperImage(src, silent) {
-  fx.homeAiWallpaperImage = normalizeCustomBackgroundImage(src);
+  var image = normalizeCustomBackgroundImage(src);
+  fx.homeVinylWallpaperMedia = image ? { type: 'image', src: image } : null;
+  fx.homeAiWallpaperImage = image;
   updateHomeAiWallpaperControls();
   saveLyricLayout();
-  if (!silent) showToast(fx.homeAiWallpaperImage ? 'AI DJ 展示栏壁纸已应用' : 'AI DJ 展示栏壁纸已清除');
+  if (!silent) showToast(image ? 'AI DJ 展示栏壁纸已应用' : 'AI DJ 展示栏壁纸已清除');
+}
+function setHomeVinylWallpaperVideo(src, name, silent) {
+  var media = normalizeHomeVinylWallpaperMedia({ type: 'video', src: src, name: name || '' });
+  fx.homeVinylWallpaperMedia = media;
+  fx.homeAiWallpaperImage = '';
+  updateHomeAiWallpaperControls();
+  saveLyricLayout();
+  if (!silent) showToast(media ? 'AI DJ 展示栏视频壁纸已应用' : 'AI DJ 展示栏视频壁纸读取失败');
 }
 function clearHomeAiWallpaper() {
+  fx.homeVinylWallpaperMedia = null;
   setHomeAiWallpaperImage('');
 }
 function readHomeAiWallpaperFile(file) {
-  if (!file || !/^image\//i.test(file.type || '')) {
-    showToast('请选择图片文件');
+  if (!file || (!/^image\//i.test(file.type || '') && !/^video\//i.test(file.type || ''))) {
+    showToast('请选择图片或视频文件');
     return;
   }
   var reader = new FileReader();
   reader.onload = function(e) {
+    if (/^video\//i.test(file.type || '')) {
+      setHomeVinylWallpaperVideo(String(e.target.result || ''), file.name || '');
+      return;
+    }
     var img = new Image();
     img.onload = function() {
       var maxSide = 1800;
@@ -22664,10 +22953,10 @@ function readHomeAiWallpaperFile(file) {
       }
       setHomeAiWallpaperImage(out);
     };
-    img.onerror = function(){ showToast('AI DJ 壁纸读取失败'); };
+    img.onerror = function(){ showToast('AI DJ 展示栏壁纸读取失败'); };
     img.src = e.target.result;
   };
-  reader.onerror = function(){ showToast('AI DJ 壁纸读取失败'); };
+  reader.onerror = function(){ showToast('AI DJ 展示栏壁纸读取失败'); };
   reader.readAsDataURL(file);
 }
 function applyCustomBackground() {
@@ -23569,6 +23858,9 @@ function updateFxInputs() {
   updateIconAccentControls();
   updateUiFontControls();
   updateHomeAiWallpaperControls();
+  applyMissAvatarMedia();
+  applyMissChatWallpaperMedia();
+  updateMissMediaControls();
   updateCustomBackgroundControls();
   updateVisualTintControls();
   applyControlGlassChromaticOffset();
@@ -24315,6 +24607,22 @@ function bindFxPanel() {
       e.target.value = '';
     });
   }
+  var missAvatarInput = document.getElementById('miss-avatar-input');
+  if (missAvatarInput) {
+    missAvatarInput.addEventListener('change', function(e){
+      var file = e.target.files && e.target.files[0];
+      if (file) readMissAvatarMediaFile(file);
+      e.target.value = '';
+    });
+  }
+  var missWallpaperInput = document.getElementById('miss-wallpaper-input');
+  if (missWallpaperInput) {
+    missWallpaperInput.addEventListener('change', function(e){
+      var file = e.target.files && e.target.files[0];
+      if (file) readMissChatWallpaperFile(file);
+      e.target.value = '';
+    });
+  }
   ['ui-accent-picker','visual-tint-picker','home-accent-picker','home-icon-picker','visual-icon-picker','bg-color-picker','shelf-accent-picker','lyric-color-picker','lyric-highlight-picker','lyric-glow-picker'].forEach(function(id){
     bindColorLabPicker(document.getElementById(id));
   });
@@ -24496,6 +24804,7 @@ function toggleFx(key) {
   if (key === 'desktopLyricsClickThrough' || key === 'desktopLyricsCinema' || key === 'desktopLyricsHighlight') pushDesktopLyricsState(true);
   if (key === 'lyricGlow' || key === 'lyricGlowBeat' || key === 'lyricGlowParticles') pushDesktopLyricsState(true);
   if (key === 'wallpaperMode') applyWallpaperModeState(true);
+  if (key === 'desktopLyrics' || key === 'wallpaperMode') scheduleDesktopShellStatePush(true);
   if (key === 'shelfShowPodcasts' || key === 'shelfMergeCollections') {
     if (shelfManager && shelfManager.rebuild) shelfManager.rebuild(true);
     if (shelfManager && shelfManager.refreshTheme) shelfManager.refreshTheme();
@@ -27842,6 +28151,7 @@ var splashSoundPlayed = false;
 var splashAudioCtx = null;
 var splashSoundFallbackArmed = false;
 var splashTimer = null;
+var splashAutoDismissTimer = null;
 var reduceSplashMotion = false;
 var splashReadyToEnter = false;
 
@@ -28367,6 +28677,7 @@ function dismissSplash() {
   if (!s || s.classList.contains('hide') || s.classList.contains('exiting')) return;
   markAppPerf('splash-dismiss');
   if (splashTimer) { clearTimeout(splashTimer); splashTimer = null; }
+  if (splashAutoDismissTimer) { clearTimeout(splashAutoDismissTimer); splashAutoDismissTimer = null; }
   splashReadyToEnter = false;
   s.classList.remove('ready');
   if (typeof shouldUseIdleWallpaperPreview === 'function'
@@ -28420,6 +28731,8 @@ function markSplashReadyToEnter() {
   s.setAttribute('role', 'button');
   s.setAttribute('tabindex', '0');
   s.setAttribute('aria-label', '点击进入 Mineradio');
+  if (splashAutoDismissTimer) clearTimeout(splashAutoDismissTimer);
+  splashAutoDismissTimer = setTimeout(function(){ if (splashReadyToEnter) dismissSplash(); }, 700);
 }
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -28446,7 +28759,7 @@ document.addEventListener('DOMContentLoaded', function(){
     return;
   }
   playMineradioIntroSound();
-  splashTimer = setTimeout(markSplashReadyToEnter, 5000);
+  splashTimer = setTimeout(markSplashReadyToEnter, 2600);
 });
 
 var desktopOverlayPushState = {
@@ -28678,9 +28991,118 @@ function applyWallpaperModeState(force) {
   }
   pushWallpaperState(!!force);
 }
+var desktopShellStateTimer = 0;
+var desktopShellLastKey = '';
+var desktopShellCommandBound = false;
+function currentDesktopThumbnailClip() {
+  var disc = document.querySelector('.home-vinyl-disc.is-playing');
+  if (!disc || !disc.getBoundingClientRect || !disc.offsetParent) return null;
+  var rect = disc.getBoundingClientRect();
+  var left = Math.max(0, Math.min(window.innerWidth, rect.left));
+  var top = Math.max(0, Math.min(window.innerHeight, rect.top));
+  var right = Math.max(left, Math.min(window.innerWidth, rect.right));
+  var bottom = Math.max(top, Math.min(window.innerHeight, rect.bottom));
+  var width = right - left;
+  var height = bottom - top;
+  if (width < 24 || height < 24) return null;
+  return {
+    x: Math.round(left),
+    y: Math.round(top),
+    width: Math.round(width),
+    height: Math.round(height)
+  };
+}
+function buildDesktopShellState() {
+  var meta = currentDesktopSongMeta();
+  var song = typeof currentCoverSong === 'function' ? currentCoverSong() : null;
+  var hasTrack = !!(playQueue && playQueue.length && currentIdx >= 0);
+  var isPlaying = !!(playing && audio && audio.src && !audio.paused && !audio.ended);
+  return {
+    title: meta.title || 'Mineradio',
+    artist: meta.artist || '',
+    cover: meta.cover || '',
+    playing: isPlaying,
+    liked: !!(song && typeof isSongLiked === 'function' && isSongLiked(song)),
+    playMode: playMode || 'loop',
+    desktopLyrics: !!(fx && fx.desktopLyrics),
+    wallpaperMode: !!(fx && fx.wallpaperMode),
+    hasTrack: hasTrack,
+    thumbnailClip: currentDesktopThumbnailClip()
+  };
+}
+function pushDesktopShellState(force) {
+  var api = getDesktopWindowApi();
+  if (!api || typeof api.updateShellState !== 'function') return;
+  var payload = buildDesktopShellState();
+  var key = JSON.stringify(payload);
+  if (!force && key === desktopShellLastKey) return;
+  desktopShellLastKey = key;
+  api.updateShellState(payload).catch(function(e){ console.warn('desktop shell state failed:', e); });
+}
+function scheduleDesktopShellStatePush(force) {
+  if (desktopShellStateTimer) clearTimeout(desktopShellStateTimer);
+  desktopShellStateTimer = setTimeout(function() {
+    desktopShellStateTimer = 0;
+    pushDesktopShellState(!!force);
+  }, force ? 40 : 160);
+}
+function notifyDesktopShellCommandResult(command, ok, error) {
+  var api = getDesktopWindowApi();
+  if (!api || typeof api.notifyShellCommandResult !== 'function') return;
+  api.notifyShellCommandResult({ command: command, ok: !!ok, error: error || '' }).catch(function(){});
+}
+function handleDesktopShellCommand(payload) {
+  var command = payload && payload.command || '';
+  try {
+    switch (command) {
+      case 'prev':
+        prevTrack();
+        break;
+      case 'togglePlay':
+        togglePlay();
+        break;
+      case 'next':
+        nextTrack();
+        break;
+      case 'toggleLike':
+        toggleLikeCurrent();
+        break;
+      case 'setPlayMode':
+        if (payload.payload && ['loop', 'shuffle', 'single'].indexOf(payload.payload.mode) >= 0) {
+          playMode = payload.payload.mode;
+          updatePlayModeButton(true);
+          showToast(playModeLabel(playMode));
+        }
+        break;
+      case 'toggleWallpaper':
+        toggleFx('wallpaperMode');
+        break;
+      case 'toggleDesktopLyrics':
+        toggleFx('desktopLyrics');
+        break;
+      case 'settings':
+        showToast('设置中心开发中');
+        break;
+      default:
+        notifyDesktopShellCommandResult(command, false, 'UNKNOWN_COMMAND');
+        return;
+    }
+    scheduleDesktopShellStatePush(true);
+    notifyDesktopShellCommandResult(command, true);
+  } catch (error) {
+    notifyDesktopShellCommandResult(command, false, error && error.message || 'COMMAND_FAILED');
+  }
+}
+function bindDesktopShellBridge(api) {
+  if (desktopShellCommandBound || !api || typeof api.onShellCommand !== 'function') return;
+  desktopShellCommandBound = true;
+  api.onShellCommand(handleDesktopShellCommand);
+  scheduleDesktopShellStatePush(true);
+}
 function syncDesktopOverlayState() {
   if (fx.desktopLyrics) pushDesktopLyricsState(false);
   if (fx.wallpaperMode) pushWallpaperState(false);
+  scheduleDesktopShellStatePush(false);
 }
 setInterval(function(){
   if (fx && (fx.desktopLyrics || fx.wallpaperMode)) syncDesktopOverlayState();
@@ -28728,6 +29150,8 @@ function toggleFullscreen() {
   document.body.classList.remove('desktop-fullscreen');
   desktopFullscreenActive = false;
   syncCursorAutoHideMode();
+  bindDesktopShellBridge(api);
+  window.addEventListener('resize', function(){ scheduleDesktopShellStatePush(true); });
 
   var maxBtn = document.querySelector('[data-window-action="maximize"]');
   var maxIcon = maxBtn && maxBtn.querySelector('.icon-maximize');

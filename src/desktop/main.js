@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell, screen, session, globalShortcut, dialog, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, screen, session, globalShortcut, dialog, Tray, Menu, nativeImage } = require('electron');
 const net = require('net');
 const path = require('path');
 const fs = require('fs');
@@ -21,6 +21,20 @@ let desktopLyricsLastMiddleAt = 0;
 let wallpaperWindow = null;
 let wallpaperState = {};
 let tray = null;
+let trayMenuWindow = null;
+let desktopShellState = {
+  title: 'Mineradio',
+  artist: '',
+  cover: '',
+  playing: false,
+  liked: false,
+  playMode: 'loop',
+  desktopLyrics: false,
+  wallpaperMode: false,
+  hasTrack: false,
+  thumbnailClip: null,
+  updatedAt: 0,
+};
 let isQuitting = false;
 let htmlFullscreenActive = false;
 let windowFullscreenActive = false;
@@ -35,6 +49,8 @@ const MIN_WINDOWED_HEIGHT = 540;
 const APP_NAME = 'Mineradio';
 const APP_USER_MODEL_ID = 'com.mineradio.desktop';
 const APP_ICON_ICO = path.join(__dirname, '..', '..', 'public', 'icon.ico');
+const TRAY_MENU_WIDTH = 270;
+const TRAY_MENU_HEIGHT = 510;
 const NETEASE_LOGIN_PARTITION = 'persist:mineradio-netease-login';
 const NETEASE_LOGIN_URL = 'https://music.163.com/#/login';
 const QQ_LOGIN_PARTITION = 'persist:mineradio-qqmusic-login';
@@ -61,7 +77,8 @@ for (const [name, value] of CHROMIUM_PERFORMANCE_SWITCHES) {
   if (value == null) app.commandLine.appendSwitch(name);
   else app.commandLine.appendSwitch(name, value);
 }
-const gotSingleInstanceLock = app.requestSingleInstanceLock();
+const allowMultipleInstances = process.env.MINERADIO_ALLOW_MULTI_INSTANCE === '1';
+const gotSingleInstanceLock = allowMultipleInstances || app.requestSingleInstanceLock();
 
 const QQ_LOGIN_COOKIE_PRIORITY = [
   'uin',
@@ -311,17 +328,221 @@ function quitFromTray() {
   app.quit();
 }
 
+function shellText(value, fallback = '') {
+  const text = String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+  return text || fallback;
+}
+
+function normalizeThumbnailClip(value) {
+  if (!value || typeof value !== 'object') return null;
+  const x = Math.max(0, Math.round(Number(value.x) || 0));
+  const y = Math.max(0, Math.round(Number(value.y) || 0));
+  const width = Math.round(Number(value.width) || 0);
+  const height = Math.round(Number(value.height) || 0);
+  if (width < 24 || height < 24) return null;
+  return { x, y, width, height };
+}
+
+function normalizeDesktopShellState(payload = {}) {
+  const mode = ['loop', 'shuffle', 'single'].includes(payload.playMode) ? payload.playMode : 'loop';
+  const title = shellText(payload.title, APP_NAME);
+  const artist = shellText(payload.artist, '');
+  return {
+    title,
+    artist,
+    cover: shellText(payload.cover, ''),
+    playing: !!payload.playing,
+    liked: !!payload.liked,
+    playMode: mode,
+    desktopLyrics: !!payload.desktopLyrics,
+    wallpaperMode: !!payload.wallpaperMode,
+    hasTrack: payload.hasTrack != null ? !!payload.hasTrack : title !== APP_NAME,
+    thumbnailClip: normalizeThumbnailClip(payload.thumbnailClip),
+    updatedAt: Date.now(),
+  };
+}
+
+function currentShellTitle() {
+  if (!desktopShellState.hasTrack) return APP_NAME;
+  return desktopShellState.artist
+    ? `${desktopShellState.title} - ${desktopShellState.artist}`
+    : desktopShellState.title;
+}
+
+function createThumbarIcon(kind) {
+  const shapes = {
+    prev: '<path d="M5 4v16M19 5 8 12l11 7z"/>',
+    play: '<path d="m8 5 11 7-11 7z"/>',
+    pause: '<path d="M8 5v14M16 5v14"/>',
+    next: '<path d="M19 4v16M5 5l11 7-11 7z"/>',
+  };
+  const shape = shapes[kind] || shapes.play;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${shape}</svg>`;
+  return nativeImage.createFromDataURL(`data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`).resize({ width: 16, height: 16 });
+}
+
+function updateWindowsThumbnailPreview() {
+  if (process.platform !== 'win32' || !mainWindow || mainWindow.isDestroyed()) return;
+  try {
+    mainWindow.setThumbnailToolTip(currentShellTitle());
+    mainWindow.setThumbnailClip(desktopShellState.thumbnailClip || { x: 0, y: 0, width: 0, height: 0 });
+  } catch (error) {
+    console.warn('Update Windows thumbnail failed:', error.message);
+  }
+}
+
+function sendTrayMenuState() {
+  if (!trayMenuWindow || trayMenuWindow.isDestroyed()) return;
+  trayMenuWindow.webContents.send('mineradio-tray-menu-state', desktopShellState);
+}
+
+function updateWindowsThumbarButtons() {
+  if (process.platform !== 'win32' || !mainWindow || mainWindow.isDestroyed()) return;
+  const disabledFlags = desktopShellState.hasTrack ? [] : ['disabled'];
+  const playLabel = desktopShellState.playing ? '暂停' : '播放';
+  try {
+    mainWindow.setTitle(currentShellTitle());
+    mainWindow.setThumbarButtons([
+      { tooltip: '上一首', icon: createThumbarIcon('prev'), flags: disabledFlags, click: () => dispatchShellCommand('prev') },
+      { tooltip: playLabel, icon: createThumbarIcon(desktopShellState.playing ? 'pause' : 'play'), flags: [], click: () => dispatchShellCommand('togglePlay') },
+      { tooltip: '下一首', icon: createThumbarIcon('next'), flags: disabledFlags, click: () => dispatchShellCommand('next') },
+    ]);
+  } catch (error) {
+    console.warn('Update Windows thumbar failed:', error.message);
+  }
+}
+
+function updateDesktopShellState(payload = {}) {
+  desktopShellState = normalizeDesktopShellState(payload);
+  if (tray && !tray.isDestroyed()) tray.setToolTip(currentShellTitle());
+  updateWindowsThumbnailPreview();
+  updateWindowsThumbarButtons();
+  sendTrayMenuState();
+  return { ok: true, state: desktopShellState };
+}
+
+function sendShellCommandToRenderer(command, payload = {}) {
+  const message = { command, payload, at: Date.now() };
+  const send = () => {
+    if (!mainWindow || mainWindow.isDestroyed()) return false;
+    mainWindow.webContents.send('mineradio-shell-command', message);
+    return true;
+  };
+  if (send()) return true;
+  createWindow()
+    .then(() => setTimeout(send, 250))
+    .catch((error) => console.warn('Shell command window restore failed:', error.message));
+  return true;
+}
+
+function dispatchShellCommand(command, payload = {}) {
+  const name = shellText(command, '');
+  if (!name) return { ok: false, error: 'EMPTY_COMMAND' };
+  if (name === 'quit') {
+    quitFromTray();
+    return { ok: true };
+  }
+  if (name === 'showMain') {
+    showMainWindow();
+    return { ok: true };
+  }
+  if (name === 'settings') {
+    showMainWindow();
+    sendShellCommandToRenderer('settings', payload);
+    return { ok: true };
+  }
+  return { ok: sendShellCommandToRenderer(name, payload) };
+}
+
+function trayMenuUrl() {
+  return pathToFileURL(path.join(__dirname, '..', '..', 'public', 'tray-menu.html')).toString();
+}
+
+function positionTrayMenuWindow() {
+  if (!trayMenuWindow || trayMenuWindow.isDestroyed() || !tray || tray.isDestroyed()) return;
+  const width = TRAY_MENU_WIDTH;
+  const trayBounds = tray.getBounds();
+  const display = screen.getDisplayMatching(trayBounds);
+  const workArea = display && display.workArea ? display.workArea : screen.getPrimaryDisplay().workArea;
+  const height = Math.min(TRAY_MENU_HEIGHT, Math.max(360, workArea.height - 16));
+  let x = Math.round(trayBounds.x + trayBounds.width / 2 - width / 2);
+  let y = Math.round(trayBounds.y - height - 10);
+  if (y < workArea.y) y = Math.round(trayBounds.y + trayBounds.height + 10);
+  x = Math.max(workArea.x + 8, Math.min(x, workArea.x + workArea.width - width - 8));
+  y = Math.max(workArea.y + 8, Math.min(y, workArea.y + workArea.height - height - 8));
+  trayMenuWindow.setBounds({ x, y, width, height }, false);
+}
+
+function nativeTrayFallbackMenu() {
+  return Menu.buildFromTemplate([
+    { label: currentShellTitle(), enabled: false },
+    { type: 'separator' },
+    { label: desktopShellState.playing ? '暂停' : '播放', click: () => dispatchShellCommand('togglePlay') },
+    { label: '上一首', enabled: desktopShellState.hasTrack, click: () => dispatchShellCommand('prev') },
+    { label: '下一首', enabled: desktopShellState.hasTrack, click: () => dispatchShellCommand('next') },
+    { type: 'separator' },
+    { label: '显示 Mineradio', click: () => dispatchShellCommand('showMain') },
+    { label: '退出', click: () => dispatchShellCommand('quit') },
+  ]);
+}
+
+function createTrayMenuWindow() {
+  if (trayMenuWindow && !trayMenuWindow.isDestroyed()) return trayMenuWindow;
+  trayMenuWindow = new BrowserWindow({
+    width: TRAY_MENU_WIDTH,
+    height: TRAY_MENU_HEIGHT,
+    show: false,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    focusable: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      sandbox: false,
+    },
+  });
+  trayMenuWindow.on('blur', () => {
+    if (trayMenuWindow && !trayMenuWindow.isDestroyed()) trayMenuWindow.hide();
+  });
+  trayMenuWindow.on('closed', () => {
+    trayMenuWindow = null;
+  });
+  trayMenuWindow.webContents.on('did-finish-load', sendTrayMenuState);
+  trayMenuWindow.loadURL(trayMenuUrl()).catch((error) => {
+    console.warn('Tray menu load failed:', error.message);
+  });
+  return trayMenuWindow;
+}
+
+function showTrayMenuWindow() {
+  try {
+    createAppTray();
+    const win = createTrayMenuWindow();
+    if (!win || win.isDestroyed()) throw new Error('NO_TRAY_MENU_WINDOW');
+    if (win.isVisible()) {
+      win.hide();
+      return;
+    }
+    positionTrayMenuWindow();
+    sendTrayMenuState();
+    win.show();
+    win.focus();
+  } catch (error) {
+    console.warn('Custom tray menu unavailable:', error.message);
+    if (tray && !tray.isDestroyed()) tray.popUpContextMenu(nativeTrayFallbackMenu());
+  }
+}
+
 function createAppTray() {
   if (tray && !tray.isDestroyed()) return tray;
   tray = new Tray(APP_ICON_ICO);
-  tray.setToolTip(APP_NAME);
-  tray.setContextMenu(Menu.buildFromTemplate([
-    { label: 'Show Mineradio', click: showMainWindow },
-    { type: 'separator' },
-    { label: 'Quit', click: quitFromTray },
-  ]));
+  tray.setToolTip(currentShellTitle());
   tray.on('click', showMainWindow);
   tray.on('double-click', showMainWindow);
+  tray.on('right-click', showTrayMenuWindow);
   return tray;
 }
 
@@ -1470,6 +1691,22 @@ ipcMain.handle('desktop-window-close', (event) => {
   win.close();
 });
 
+ipcMain.handle('mineradio-shell-state-update', (_event, payload) => {
+  return updateDesktopShellState(payload || {});
+});
+
+ipcMain.handle('mineradio-shell-command-result', (_event, payload = {}) => {
+  if (trayMenuWindow && !trayMenuWindow.isDestroyed()) {
+    trayMenuWindow.webContents.send('mineradio-tray-menu-command-result', payload || {});
+  }
+  return { ok: true };
+});
+
+ipcMain.handle('mineradio-tray-menu-command', (_event, payload = {}) => {
+  const command = payload && payload.command;
+  return dispatchShellCommand(command, payload);
+});
+
 ipcMain.handle('mineradio-hotkeys-configure-global', (_event, bindings) => {
   return configureMineradioGlobalHotkeys(bindings);
 });
@@ -1770,6 +2007,7 @@ async function createWindow() {
 
   mainWindow.webContents.once('did-finish-load', () => {
     sendWindowState(mainWindow);
+    updateWindowsThumbarButtons();
   });
 
   mainWindow.webContents.on('before-input-event', (event, input) => {
@@ -1844,6 +2082,7 @@ if (!gotSingleInstanceLock) {
     screen.on('display-metrics-changed', () => {
       positionDesktopLyricsWindow();
       positionWallpaperWindow();
+      positionTrayMenuWindow();
       scheduleWindowStateSend(mainWindow);
     });
     screen.on('display-added', () => scheduleWindowStateSend(mainWindow));
@@ -1864,6 +2103,8 @@ if (!gotSingleInstanceLock) {
     isQuitting = true;
     unregisterMineradioGlobalHotkeys();
     closeOverlayWindows();
+    if (trayMenuWindow && !trayMenuWindow.isDestroyed()) trayMenuWindow.destroy();
+    trayMenuWindow = null;
     if (tray && !tray.isDestroyed()) tray.destroy();
     tray = null;
     if (localServer && localServer.close) localServer.close();

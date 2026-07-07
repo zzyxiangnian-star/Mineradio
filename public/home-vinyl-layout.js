@@ -12,8 +12,8 @@
   function buildHexLayout(count, iconSize) {
     count = Math.max(0, Math.floor(Number(count) || 0));
     iconSize = Math.max(24, Number(iconSize) || 84);
-    var spacingX = Math.round(iconSize * 0.9 * 1000) / 1000;
-    var spacingY = Math.round(iconSize * 0.78 * 1000) / 1000;
+    var spacingX = Math.round(iconSize * 1.18 * 1000) / 1000;
+    var spacingY = Math.round(iconSize * 1.04 * 1000) / 1000;
     var columns = Math.max(3, Math.ceil(Math.sqrt(Math.max(1, count) * 1.18)));
     var items = [];
     for (var index = 0; index < count; index++) {
@@ -42,9 +42,10 @@
   function visualForPoint(dx, dy, radius) {
     radius = Math.max(1, Number(radius) || 1);
     var normalized = clamp(Math.sqrt(dx * dx + dy * dy) / radius, 0, 1);
+    var edgeFade = Math.pow(normalized, 1.85);
     return {
-      scale: 1.3 - normalized * 0.58,
-      opacity: 1 - normalized * 0.34,
+      scale: 1.13 - normalized * 0.42,
+      opacity: 1 - edgeFade * 0.78,
       zIndex: Math.round((1 - normalized) * 1000),
       normalized: normalized,
     };

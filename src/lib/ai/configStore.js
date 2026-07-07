@@ -4,6 +4,7 @@ const path = require('path');
 const DEFAULT_BASE_URL = 'https://api.xiaomimimo.com/v1';
 const DEFAULT_MODEL = 'mimo-v2.5-pro';
 const DEFAULT_AUTH_METHOD = 'api-key';
+const DEEPSEEK_DEFAULT_MODEL = 'deepseek-v4-pro';
 
 function isLocalHttpUrl(url) {
   return url.protocol === 'http:' && /^(localhost|127\.0\.0\.1|\[::1\]|::1)$/i.test(url.hostname);
@@ -40,6 +41,27 @@ function normalizeAuthMethod(value) {
   return String(value || DEFAULT_AUTH_METHOD).toLowerCase() === 'bearer' ? 'bearer' : DEFAULT_AUTH_METHOD;
 }
 
+function detectAiProvider(baseUrl) {
+  try {
+    const hostname = new URL(String(baseUrl || '')).hostname.toLowerCase();
+    if (hostname === 'deepseek.com' || hostname.endsWith('.deepseek.com')) return 'deepseek';
+    if (hostname === 'xiaomimimo.com' || hostname.endsWith('.xiaomimimo.com')) return 'mimo';
+  } catch (error) {}
+  return 'openai-compatible';
+}
+
+function normalizeProviderConfig(config) {
+  const normalizedBaseUrl = normalizeBaseUrl(config && config.baseUrl || DEFAULT_BASE_URL);
+  const provider = detectAiProvider(normalizedBaseUrl);
+  let model = String(config && config.model || DEFAULT_MODEL).trim() || DEFAULT_MODEL;
+  let authMethod = normalizeAuthMethod(config && config.authMethod);
+  if (provider === 'deepseek') {
+    if (!model || /^mimo(?:-|$)/i.test(model)) model = DEEPSEEK_DEFAULT_MODEL;
+    authMethod = 'bearer';
+  }
+  return { baseUrl: normalizedBaseUrl, model, authMethod };
+}
+
 function maskApiKey(apiKey) {
   const key = String(apiKey || '');
   if (!key) return '';
@@ -48,11 +70,12 @@ function maskApiKey(apiKey) {
 
 function metadataFromConfig(config) {
   const resolved = config || {};
+  const providerConfig = normalizeProviderConfig(resolved);
   return {
     enabled: resolved.enabled !== false,
-    baseUrl: normalizeBaseUrl(resolved.baseUrl || DEFAULT_BASE_URL),
-    model: String(resolved.model || DEFAULT_MODEL).trim() || DEFAULT_MODEL,
-    authMethod: normalizeAuthMethod(resolved.authMethod),
+    baseUrl: providerConfig.baseUrl,
+    model: providerConfig.model,
+    authMethod: providerConfig.authMethod,
     hasApiKey: !!String(resolved.apiKey || '').trim(),
     maskedApiKey: maskApiKey(resolved.apiKey),
   };
@@ -89,12 +112,13 @@ function resolveAiConfig(options = {}) {
     authMethod: saved.authMethod || env.MIMO_AUTH_METHOD || DEFAULT_AUTH_METHOD,
     source: fromSaved ? 'saved' : (envHasKey ? 'env' : 'default'),
   };
+  const providerConfig = normalizeProviderConfig(base);
   return {
     enabled: base.enabled,
     apiKey: base.apiKey,
-    baseUrl: normalizeBaseUrl(base.baseUrl),
-    model: String(base.model || DEFAULT_MODEL).trim() || DEFAULT_MODEL,
-    authMethod: normalizeAuthMethod(base.authMethod),
+    baseUrl: providerConfig.baseUrl,
+    model: providerConfig.model,
+    authMethod: providerConfig.authMethod,
     source: base.source,
   };
 }
@@ -111,6 +135,10 @@ function mergeAiConfigUpdate(previous, update) {
   };
   if (update.clearApiKey) next.apiKey = '';
   else if (typeof update.apiKey === 'string' && update.apiKey.trim()) next.apiKey = update.apiKey.trim();
+  const providerConfig = normalizeProviderConfig(next);
+  next.baseUrl = providerConfig.baseUrl;
+  next.model = providerConfig.model;
+  next.authMethod = providerConfig.authMethod;
   return next;
 }
 
@@ -135,9 +163,11 @@ module.exports = {
   DEFAULT_BASE_URL,
   DEFAULT_MODEL,
   DEFAULT_AUTH_METHOD,
+  DEEPSEEK_DEFAULT_MODEL,
   normalizeBaseUrl,
   normalizeChatCompletionsUrl,
   normalizeAuthMethod,
+  detectAiProvider,
   maskApiKey,
   metadataFromConfig,
   configFilePath,

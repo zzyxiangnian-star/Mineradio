@@ -1,11 +1,28 @@
 const {
   resolveAiConfig,
   normalizeChatCompletionsUrl,
+  detectAiProvider,
   DEFAULT_MODEL,
 } = require('./configStore');
 
 function aiConfig() {
   return resolveAiConfig();
+}
+
+function buildChatRequestBody(config, messages, options = {}) {
+  const provider = detectAiProvider(config.baseUrl);
+  const body = {
+    model: config.model || DEFAULT_MODEL,
+    messages,
+    temperature: options.temperature == null ? 1.0 : Number(options.temperature),
+    top_p: options.topP == null ? 0.95 : Number(options.topP),
+    stream: false,
+    thinking: { type: 'disabled' },
+  };
+  const maxTokens = Number(options.maxCompletionTokens || 1024);
+  if (provider === 'deepseek') body.max_tokens = maxTokens;
+  else body.max_completion_tokens = maxTokens;
+  return body;
 }
 
 async function callMiMoChat(messages, options = {}) {
@@ -30,15 +47,7 @@ async function callMiMoChat(messages, options = {}) {
     const response = await fetch(normalizeChatCompletionsUrl(config.baseUrl), {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        model: config.model || DEFAULT_MODEL,
-        messages,
-        max_completion_tokens: Number(options.maxCompletionTokens || 1024),
-        temperature: options.temperature == null ? 1.0 : Number(options.temperature),
-        top_p: options.topP == null ? 0.95 : Number(options.topP),
-        stream: false,
-        thinking: { type: 'disabled' },
-      }),
+      body: JSON.stringify(buildChatRequestBody(config, messages, options)),
       signal: controller.signal,
     });
 
@@ -78,4 +87,4 @@ async function callMiMoChat(messages, options = {}) {
   }
 }
 
-module.exports = { aiConfig, callMiMoChat };
+module.exports = { aiConfig, buildChatRequestBody, callMiMoChat };

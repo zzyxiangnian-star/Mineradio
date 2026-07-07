@@ -45,6 +45,14 @@ contextBridge.exposeInMainWorld('desktopWindow', {
   resetVideoWallpaper: () => ipcRenderer.invoke('mineradio-wallpaper-reset-video'),
   chooseWallpaperScene: () => ipcRenderer.invoke('mineradio-wallpaper-choose-scene'),
   resetWallpaperScene: () => ipcRenderer.invoke('mineradio-wallpaper-reset-scene'),
+  updateShellState: (payload) => ipcRenderer.invoke('mineradio-shell-state-update', payload || {}),
+  onShellCommand: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, payload) => callback(payload || {});
+    ipcRenderer.on('mineradio-shell-command', listener);
+    return () => ipcRenderer.removeListener('mineradio-shell-command', listener);
+  },
+  notifyShellCommandResult: (payload) => ipcRenderer.invoke('mineradio-shell-command-result', payload || {}),
   onStateChange: (callback) => {
     const listener = (_event, state) => callback(state);
     ipcRenderer.on('desktop-window-state', listener);

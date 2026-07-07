@@ -20,12 +20,18 @@
     moved: false,
     pointerId: null,
     lastPoint: null,
+    downPoint: null,
+    downIndex: -1,
+    suppressNextClick: false,
     lastTime: 0,
     frame: 0,
     motionFrame: 0,
     nodes: new Map(),
     pool: [],
     reducedMotion: false,
+    zoom: 1,
+    minZoom: .72,
+    maxZoom: 2.35,
   };
 
   function songKey(song) {
@@ -64,7 +70,8 @@
   }
 
   function iconSizeForViewport(metrics) {
-    return Math.max(56, Math.min(104, metrics.radius * 0.29));
+    var base = Math.max(52, Math.min(88, metrics.radius * 0.22));
+    return Math.round(base * state.zoom);
   }
 
   function releaseNode(index) {
@@ -81,10 +88,20 @@
     node.type = 'button';
     node.className = 'home-vinyl-disc';
     node.setAttribute('role', 'option');
-    node.addEventListener('click', function() {
+    node.addEventListener('click', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (state.suppressNextClick) {
+        state.suppressNextClick = false;
+        return;
+      }
       if (state.moved) return;
       var index = Number(node.getAttribute('data-index'));
-      if (Number.isFinite(index)) selectIndex(index, true);
+      if (Number.isFinite(index)) {
+        state.selectedIndex = index;
+        playIndex(index);
+        scheduleRender();
+      }
     });
     return node;
   }
@@ -185,14 +202,18 @@
     state.motionFrame = requestAnimationFrame(step);
   }
 
+  function playIndex(index) {
+    if (!adapter || !adapter.playCandidate || !state.tracks[index]) return;
+    adapter.playCandidate(state.tracks, index, state.playlist);
+  }
+
   function selectIndex(index, autoplay) {
     if (!state.layout || !state.tracks[index]) return;
     state.selectedIndex = index;
     var metrics = viewportMetrics();
     var target = Layout.snapOffsetForIndex(state.layout.items, index, { x: metrics.width / 2, y: metrics.height / 2 });
-    animateToOffset(target, function() {
-      if (autoplay && adapter && adapter.playCandidate) adapter.playCandidate(state.tracks, index, state.playlist);
-    });
+    animateToOffset(target);
+    if (autoplay) playIndex(index);
   }
 
   function settleToNearest() {
@@ -228,22 +249,31 @@
 
   function onPointerDown(event) {
     if (!state.tracks.length || event.button > 0) return;
+    event.preventDefault();
+    event.stopPropagation();
     cancelMotion();
+    var disc = event.target && event.target.closest ? event.target.closest('.home-vinyl-disc') : null;
     state.dragging = true;
     state.moved = false;
     state.pointerId = event.pointerId;
     state.lastPoint = { x: event.clientX, y: event.clientY };
+    state.downPoint = { x: event.clientX, y: event.clientY };
+    state.downIndex = disc ? Number(disc.getAttribute('data-index')) : -1;
     state.lastTime = performance.now();
     state.velocity = { x: 0, y: 0 };
+    els.viewport.setAttribute('data-dragging', 'true');
     els.viewport.setPointerCapture(event.pointerId);
   }
 
   function onPointerMove(event) {
     if (!state.dragging || event.pointerId !== state.pointerId) return;
+    event.stopPropagation();
     var now = performance.now();
     var dx = event.clientX - state.lastPoint.x;
     var dy = event.clientY - state.lastPoint.y;
-    if (Math.hypot(dx, dy) > 2) state.moved = true;
+    var movedX = state.downPoint ? event.clientX - state.downPoint.x : dx;
+    var movedY = state.downPoint ? event.clientY - state.downPoint.y : dy;
+    if (Math.hypot(movedX, movedY) > 6) state.moved = true;
     var proposed = { x: state.offset.x + dx, y: state.offset.y + dy };
     var clamped = Layout.clampOffset(proposed, state.layout, viewportMetrics());
     state.offset.x = proposed.x === clamped.x ? proposed.x : state.offset.x + dx * .34;
@@ -257,18 +287,44 @@
 
   function onPointerUp(event) {
     if (!state.dragging || event.pointerId !== state.pointerId) return;
+    event.preventDefault();
+    event.stopPropagation();
+    var clickIndex = !state.moved && Number.isFinite(state.downIndex) ? state.downIndex : -1;
     state.dragging = false;
     try { els.viewport.releasePointerCapture(event.pointerId); } catch (error) {}
     state.pointerId = null;
-    startInertia();
+    state.downPoint = null;
+    state.downIndex = -1;
+    els.viewport.removeAttribute('data-dragging');
+    if (clickIndex >= 0) {
+      state.velocity = { x: 0, y: 0 };
+      state.suppressNextClick = true;
+      state.selectedIndex = clickIndex;
+      playIndex(clickIndex);
+      scheduleRender();
+    } else {
+      startInertia();
+    }
     setTimeout(function(){ state.moved = false; }, 0);
   }
 
-  function onPlayClick() { if (adapter && adapter.togglePlay) adapter.togglePlay(); }
-  function onPreviousClick() { if (adapter && adapter.previous) adapter.previous(); }
-  function onNextClick() { if (adapter && adapter.next) adapter.next(); }
-  function onVolumeClick() { els.volume.parentElement.classList.toggle('open'); }
-  function onVolumeInput() { if (adapter && adapter.setVolume) adapter.setVolume(Number(this.value)); }
+  function onWheel(event) {
+    if (!state.tracks.length) return;
+    event.preventDefault();
+    event.stopPropagation();
+    var nextZoom = state.zoom * (event.deltaY > 0 ? .92 : 1.08);
+    nextZoom = Math.max(state.minZoom, Math.min(state.maxZoom, nextZoom));
+    if (Math.abs(nextZoom - state.zoom) < .005) return;
+    var focus = state.selectedIndex >= 0 ? state.selectedIndex : 0;
+    if (state.layout) {
+      var metrics = viewportMetrics();
+      focus = Layout.nearestIndex(state.layout.items, state.offset, { x: metrics.width / 2, y: metrics.height / 2 });
+    }
+    state.zoom = nextZoom;
+    Array.from(state.nodes.keys()).forEach(releaseNode);
+    rebuildLayout(focus);
+  }
+
   function onChatSubmit(event) {
     event.preventDefault();
     var text = els.chatInput.value.trim();
@@ -288,23 +344,14 @@
   }
 
   function syncTrack(song) {
-    els.title.textContent = song && (song.name || song.title) || '选择一张唱片';
-    els.artist.textContent = song && song.artist || 'Music Soul';
-    els.cover.style.opacity = '0';
-    setTimeout(function() {
-      els.cover.style.backgroundImage = coverBackground(song || {});
-      els.cover.style.opacity = '1';
-    }, state.reducedMotion ? 0 : 120);
     var key = songKey(song);
     state.playingIndex = state.tracks.findIndex(function(track){ return songKey(track) === key; });
-    if (state.playingIndex >= 0) selectIndex(state.playingIndex, false);
-    else scheduleRender();
+    if (state.playingIndex >= 0) state.selectedIndex = state.playingIndex;
+    scheduleRender();
   }
 
   function syncPlayback(isPlaying) {
     state.audible = !!isPlaying;
-    els.player.setAttribute('data-playing', String(state.audible));
-    els.play.textContent = state.audible ? 'Ⅱ' : '▶';
     scheduleRender();
   }
 
@@ -327,6 +374,8 @@
       poolSize: state.pool.length,
       selectedIndex: state.selectedIndex,
       playingIndex: state.playingIndex,
+      zoom: state.zoom,
+      iconSize: state.layout ? state.layout.iconSize : 0,
     };
   }
 
@@ -334,24 +383,18 @@
     if (state.mounted || !Layout) return api;
     adapter = nextAdapter || {};
     var ids = {
-      player:'home-vinyl-player', cover:'home-vinyl-cover', title:'home-vinyl-title', artist:'home-vinyl-artist',
-      play:'home-vinyl-play', prev:'home-vinyl-prev', next:'home-vinyl-next', volume:'home-vinyl-volume',
-      volumeSlider:'home-vinyl-volume-slider', chat:'home-vinyl-chat', chatInput:'home-vinyl-chat-input',
+      chat:'home-vinyl-chat', chatInput:'home-vinyl-chat-input',
       viewport:'home-vinyl-viewport', grid:'home-vinyl-grid', empty:'home-vinyl-empty', playlistTitle:'home-vinyl-playlist-title',
     };
     Object.keys(ids).forEach(function(key){ els[key] = document.getElementById(ids[key]); });
-    if (!els.viewport || !els.grid || !els.player) return api;
+    if (!els.viewport || !els.grid || !els.chat || !els.chatInput) return api;
     motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     state.reducedMotion = motionQuery.matches;
     els.viewport.addEventListener('pointerdown', onPointerDown);
     els.viewport.addEventListener('pointermove', onPointerMove);
     els.viewport.addEventListener('pointerup', onPointerUp);
     els.viewport.addEventListener('pointercancel', onPointerUp);
-    els.play.addEventListener('click', onPlayClick);
-    els.prev.addEventListener('click', onPreviousClick);
-    els.next.addEventListener('click', onNextClick);
-    els.volume.addEventListener('click', onVolumeClick);
-    els.volumeSlider.addEventListener('input', onVolumeInput);
+    els.viewport.addEventListener('wheel', onWheel, { passive: false });
     els.chat.addEventListener('submit', onChatSubmit);
     window.addEventListener('resize', resize);
     if (motionQuery.addEventListener) motionQuery.addEventListener('change', onMotionPreference);
@@ -375,12 +418,8 @@
       els.viewport.removeEventListener('pointermove', onPointerMove);
       els.viewport.removeEventListener('pointerup', onPointerUp);
       els.viewport.removeEventListener('pointercancel', onPointerUp);
+      els.viewport.removeEventListener('wheel', onWheel);
     }
-    if (els.play) els.play.removeEventListener('click', onPlayClick);
-    if (els.prev) els.prev.removeEventListener('click', onPreviousClick);
-    if (els.next) els.next.removeEventListener('click', onNextClick);
-    if (els.volume) els.volume.removeEventListener('click', onVolumeClick);
-    if (els.volumeSlider) els.volumeSlider.removeEventListener('input', onVolumeInput);
     if (els.chat) els.chat.removeEventListener('submit', onChatSubmit);
     state.nodes.forEach(function(node){ node.remove(); });
     state.nodes.clear();
