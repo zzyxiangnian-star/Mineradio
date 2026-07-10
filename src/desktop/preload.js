@@ -15,10 +15,19 @@ contextBridge.exposeInMainWorld('desktopWindow', {
   openKugouMusicLogin: () => ipcRenderer.invoke('kugou-music-open-login'),
   clearKugouMusicLogin: () => ipcRenderer.invoke('kugou-music-clear-login'),
   openUpdateInstaller: (filePath) => ipcRenderer.invoke('mineradio-open-update-installer', filePath),
+  updateShellState: (payload) => ipcRenderer.invoke('mineradio-shell-state-update', payload || {}),
+  onShellCommand: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, payload) => callback(payload || {});
+    ipcRenderer.on('mineradio-shell-command', listener);
+    return () => ipcRenderer.removeListener('mineradio-shell-command', listener);
+  },
   restartApp: () => ipcRenderer.invoke('mineradio-restart-app'),
   configureGlobalHotkeys: (bindings) => ipcRenderer.invoke('mineradio-hotkeys-configure-global', bindings || []),
   exportJsonFile: (payload) => ipcRenderer.invoke('mineradio-export-json-file', payload || {}),
   importJsonFile: () => ipcRenderer.invoke('mineradio-import-json-file'),
+  chooseChatWallpaper: () => ipcRenderer.invoke('mineradio-chat-wallpaper-choose-image'),
+  resetChatWallpaper: () => ipcRenderer.invoke('mineradio-chat-wallpaper-reset-image'),
   onGlobalHotkey: (callback) => {
     if (typeof callback !== 'function') return () => {};
     const listener = (_event, payload) => callback(payload || {});

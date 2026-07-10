@@ -70,6 +70,11 @@ const {
   extractQishuiPlaylistFromHtml,
   pickBestMatchedSong,
 } = require('./src/lib/qishui');
+const { detectPlaylistImportUrl } = require('./src/desktop/playlistImport');
+const {
+  normalizeKugouSong,
+  scoreKugouSongMatch,
+} = require('./src/desktop/kugouMatch');
 let QRCode = null;
 try { QRCode = require('qrcode'); } catch (_) { QRCode = null; }
 
@@ -2619,73 +2624,13 @@ function normalizeSimpleTitleForCompare(value) {
 }
 
 function mapKugouTrack(raw, index) {
-  raw = raw || {};
-  const trans = raw.trans_param || raw.transParam || {};
-  const hash = raw.hash || raw.Hash || raw.file_hash || raw.FileHash || raw.filehash || raw.audio_hash ||
-    raw['320hash'] || raw['128hash'] || raw.sqhash || raw.SQFileHash || raw.HQFileHash ||
-    trans.ogg_320_hash || trans.ogg_128_hash || '';
-  const qualityHashes = {
-    standard: raw['128hash'] || raw.hash || raw.Hash || raw.file_hash || trans.ogg_128_hash || '',
-    exhigh: raw['320hash'] || raw.HQFileHash || trans.ogg_320_hash || raw.hash || raw.Hash || raw.file_hash || '',
-    lossless: raw.sqhash || raw.SQFileHash || raw.flac_hash || raw.hash || raw.Hash || raw.file_hash || '',
-    hires: raw.hrhash || raw.high_hash || raw.sqhash || raw.SQFileHash || raw.hash || raw.Hash || raw.file_hash || '',
-    jymaster: raw.masterhash || raw.jymaster_hash || raw.hrhash || raw.sqhash || raw.SQFileHash || raw.hash || raw.Hash || raw.file_hash || '',
-  };
-  const albumAudioId = raw.album_audio_id || raw.albumAudioId || raw.audio_id || raw.audioid || raw.Audioid || raw.mixsongid || raw.songid || raw.id || '';
-  const filename = cleanKugouTrackText(raw.filename || raw.FileName || '');
-  let name = cleanKugouTrackText(raw.songname || raw.song_name || raw.name || raw.title || '');
-  let artist = cleanKugouTrackText(raw.singername || raw.singer_name || raw.author_name || raw.singer || raw.artist || '');
-  if (!artist && Array.isArray(raw.singerinfo) && raw.singerinfo[0]) artist = raw.singerinfo.map(item => item && cleanKugouTrackText(item.name)).filter(Boolean).join(' / ');
-  if (filename) {
-    const parts = String(filename).split(' - ');
-    if (parts.length >= 2) {
-      const filenameArtist = cleanKugouTrackText(parts.shift());
-      const titleFromFilename = cleanKugouTrackText(parts.join(' - '));
-      artist = artist || filenameArtist;
-      if (!name || normalizeSimpleTitleForCompare(name) === normalizeSimpleTitleForCompare(filename)) name = titleFromFilename;
-    } else {
-      name = name || filename;
-    }
-  }
-  if (name && artist && String(name).includes(' - ')) {
-    const parts = String(name).split(' - ');
-    const maybeArtist = cleanKugouTrackText(parts.shift());
-    const maybeTitle = cleanKugouTrackText(parts.join(' - '));
-    if (maybeTitle && normalizeSimpleTitleForCompare(maybeArtist) === normalizeSimpleTitleForCompare(artist)) name = maybeTitle;
-  }
-  const albumInfo = raw.albuminfo || raw.albumInfo || {};
-  const album = raw.album_name || raw.albumname || raw.album || albumInfo.name || '';
-  const albumId = raw.album_id || raw.albumid || raw.AlbumID || raw.albumId || '';
-  const cover = raw.pic || raw.img || raw.image || raw.cover || raw.sizable_cover || raw.imgurl || trans.union_cover || '';
-  const durationMs = Number(raw.timelength || raw.time_length || raw.timelen || raw.duration || raw.interval) || 0;
-  const id = String(hash || albumAudioId || name || `kugou-${index || 0}`);
-  if (!name && !id) return null;
-  return {
-    provider: 'kugou',
-    source: 'kugou',
-    type: 'kugou',
-    id,
-    mid: String(hash || ''),
-    hash: String(hash || ''),
-    qualityHashes,
-    albumAudioId: String(albumAudioId || ''),
-    albumId: String(albumId || ''),
-    name: cleanKugouTrackText(name).replace(/\s*-\s*$/, '') || '酷狗歌曲',
-    artist,
-    artists: artist ? [{ name: artist }] : [],
-    album: String(album || ''),
-    cover: String(cover || '').replace(/\{size\}/g, '300'),
-    duration: durationMs * (durationMs > 1000 ? 1 : 1000),
-    fee: Number(raw.privilege || raw.media_privilege || raw.media_pay_type || raw.pay_type || 0) || 0,
-    position: Number(raw.fsort || raw.sort || raw.position || raw.pos || 0) || 0,
-    playable: !!hash,
-  };
+  return normalizeKugouSong(raw, index);
 }
 
 function normalizeKugouSearchSong(raw, index) {
   const mapped = mapKugouTrack(raw, index);
   if (!mapped) return null;
-  if (!mapped.playable) mapped.sourceNotice = '酷狗结果可使用混合音源播放兜底';
+  if (!mapped.playable) mapped.sourceNotice = mapped.sourceNotice || '酷狗结果缺少 hash，播放时会提示换源或登录';
   return mapped;
 }
 
@@ -2734,7 +2679,7 @@ async function handleKugouSearch(keyword, limit) {
     console.warn('[KugouSearch] public search failed:', err.message);
   }
   const seen = new Set();
-  return kugouSongs.filter(song => {
+  return kugouSongs.sort((a, b) => scoreKugouSongMatch(kw, b) - scoreKugouSongMatch(kw, a)).filter(song => {
     const key = song && (song.hash || song.id || song.name + '|' + song.artist);
     if (!key || seen.has(key)) return false;
     seen.add(key);
@@ -2858,13 +2803,16 @@ async function getKugouLoginInfoFresh() {
 
 async function handleKugouSongUrl(hash, albumAudioId, albumId, qualityPreference, qualityHashes) {
   const h = String(hash || '').trim();
-  if (!h) return { provider: 'kugou', url: '', playable: false, error: 'MISSING_KUGOU_HASH', message: 'Missing Kugou hash' };
+  if (!h) {
+    const message = '酷狗结果缺少播放 hash，请换一个搜索结果或切换其他音源';
+    return { provider: 'kugou', url: '', playable: false, error: 'MISSING_KUGOU_HASH', message, reason: 'missing_hash', restriction: { provider: 'kugou', category: 'missing_hash', action: 'switch_source', message } };
+  }
   const loginInfo = getKugouLoginInfo();
   const selected = kugouHashForQuality(h, qualityPreference, qualityHashes);
   const json = await kugouTrackercdnPlayUrl(selected.hash || h, { albumAudioId, albumId, vipType: loginInfo.vipType });
   const playableUrl = kugouPlayableUrlFromResponse(json);
   const code = json && (json.error_code || json.errcode || json.status);
-  const message = playableUrl ? '' : (loginInfo.loggedIn ? '酷狗没有返回当前账号可播放地址，可能需要会员、购买或官方客户端权限' : '酷狗歌曲需要登录后获取播放地址');
+  const message = playableUrl ? '' : (loginInfo.loggedIn ? '酷狗没有返回当前账号可播放地址，可能需要会员、购买或官方客户端权限，建议换源或登录更高权限账号' : '酷狗歌曲需要登录后获取播放地址，请先登录酷狗或切换其他音源');
   return {
     provider: 'kugou',
     url: playableUrl,
@@ -4922,6 +4870,56 @@ const server = http.createServer(async (req, res) => {
       console.error('[QishuiPlaylistImport]', err);
       const status = err && /^QISHUI_URL_/.test(err.code || err.message) ? 400 : 500;
       sendJSON(res, { provider: 'qishui', error: err.code || err.message, playlist: null, tracks: [] }, status);
+    }
+    return;
+  }
+
+  if (pn === '/api/playlist/import-link') {
+    try {
+      const body = req.method === 'POST' ? await readRequestBody(req) : {};
+      const shareUrl = body.url || url.searchParams.get('url') || '';
+      const limit = Math.max(1, Math.min(100, parseInt(body.limit || url.searchParams.get('limit') || '80', 10) || 80));
+      const detected = detectPlaylistImportUrl(shareUrl);
+      if (!detected || detected.provider === 'unsupported') {
+        sendJSON(res, { provider: 'unsupported', error: 'UNSUPPORTED_PLAYLIST_LINK', playlist: null, tracks: [] }, 400);
+        return;
+      }
+      let data;
+      if (detected.provider === 'qishui') {
+        data = await handleQishuiPlaylistImport(detected.url, { limit });
+      } else if (detected.provider === 'qq') {
+        data = await handleQQPlaylistTracks(detected.id);
+      } else if (detected.provider === 'kugou') {
+        data = await handleKugouPlaylistTracks(detected.id, limit);
+      } else {
+        const detail = await playlist_detail({ id: detected.id, s: 0, cookie: userCookie, timestamp: Date.now() });
+        const pl = detail && detail.body && detail.body.playlist || {};
+        const all = typeof playlist_track_all === 'function'
+          ? await playlist_track_all({ id: detected.id, limit, offset: 0, cookie: userCookie, timestamp: Date.now() })
+          : null;
+        const rawTracks = all && all.body && (all.body.songs || all.body.tracks) || pl.tracks || [];
+        data = {
+          provider: 'netease',
+          playlist: mapDiscoverPlaylist(pl, '导入歌单'),
+          tracks: (rawTracks || []).map(mapSongRecord).filter(song => song.id && song.name),
+        };
+      }
+      const playlist = data.playlist || {};
+      sendJSON(res, {
+        ...data,
+        provider: detected.provider,
+        importedFrom: detected.url,
+        playlist: {
+          ...playlist,
+          provider: detected.provider,
+          id: playlist.id || detected.id || ('import-' + Date.now()),
+          trackCount: playlist.trackCount || (data.tracks && data.tracks.length) || 0,
+        },
+        tracks: data.tracks || [],
+      });
+    } catch (err) {
+      console.error('[PlaylistImportLink]', err);
+      sendJSON(res, { provider: 'unknown', error: err.code || err.message || 'PLAYLIST_IMPORT_FAILED', playlist: null, tracks: [] }, 500);
     }
     return;
   }
