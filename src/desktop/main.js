@@ -1,9 +1,19 @@
-const { app, BrowserWindow, ipcMain, shell, screen, session, globalShortcut, dialog, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, screen, session, globalShortcut, dialog, Tray, Menu, nativeImage } = require('electron');
 const net = require('net');
 const path = require('path');
 const fs = require('fs');
 const { pathToFileURL } = require('url');
 const { execFile, spawn } = require('child_process');
+const {
+  CHAT_WALLPAPER_IMAGE_EXTENSIONS,
+  chatWallpaperPathForExt,
+  isSupportedChatWallpaperImage,
+  toChatWallpaperInfo,
+} = require('./chatWallpaper');
+const {
+  normalizeTaskbarPreviewState,
+  taskbarClipForPreview,
+} = require('./taskbarPreview');
 
 let mainWindow = null;
 let localServer = null;
@@ -25,6 +35,7 @@ let isQuitting = false;
 let htmlFullscreenActive = false;
 let windowFullscreenActive = false;
 let mainWindowStateTimer = null;
+let taskbarPreviewState = normalizeTaskbarPreviewState({});
 const registeredGlobalHotkeys = new Map();
 
 const WINDOWED_ASPECT = 16 / 9;
@@ -340,6 +351,43 @@ function wallpaperVideoDir() {
 
 function customWallpaperPathForExt(ext) {
   return path.join(wallpaperVideoDir(), `custom-wallpaper${ext}`);
+}
+
+function removeExistingChatWallpapers() {
+  for (const ext of CHAT_WALLPAPER_IMAGE_EXTENSIONS) {
+    const filePath = chatWallpaperPathForExt(app.getPath('userData'), ext);
+    try {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    } catch (e) {
+      console.warn('Remove Music Soul chat wallpaper failed:', e.message);
+    }
+  }
+}
+
+async function chooseChatWallpaper(owner) {
+  const result = await dialog.showOpenDialog(owner || mainWindow || undefined, {
+    title: '选择 Music Soul 聊天壁纸',
+    properties: ['openFile'],
+    filters: [
+      { name: 'Image', extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif'] },
+      { name: 'All Files', extensions: ['*'] },
+    ],
+  });
+  if (result.canceled || !result.filePaths || !result.filePaths[0]) return { ok: false, canceled: true };
+  const sourcePath = result.filePaths[0];
+  if (!isSupportedChatWallpaperImage(sourcePath)) {
+    return { ok: false, error: 'UNSUPPORTED_IMAGE_FORMAT', message: '请选择 jpg、jpeg、png、webp 或 gif 图片。' };
+  }
+  const ext = path.extname(sourcePath).toLowerCase();
+  const targetPath = chatWallpaperPathForExt(app.getPath('userData'), ext);
+  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+  removeExistingChatWallpapers();
+  fs.copyFileSync(sourcePath, targetPath);
+  return {
+    ok: true,
+    canceled: false,
+    ...toChatWallpaperInfo(targetPath, path.basename(sourcePath)),
+  };
 }
 
 function removeExistingCustomWallpapers() {
@@ -1440,6 +1488,61 @@ function closeOverlayWindows() {
   closeWallpaperWindow();
 }
 
+function sendShellCommand(command, detail) {
+  if (!mainWindow || mainWindow.isDestroyed()) return false;
+  mainWindow.webContents.send('mineradio-shell-command', { command, detail: detail || {} });
+  return true;
+}
+
+function makeTaskbarSvgIcon(kind) {
+  const pathMap = {
+    prev: '<path d="M7 6h2v12H7zM10 12l8-6v12z" fill="white"/>',
+    play: '<path d="M8 5v14l11-7z" fill="white"/>',
+    pause: '<path d="M7 5h4v14H7zM14 5h4v14h-4z" fill="white"/>',
+    next: '<path d="M15 6h2v12h-2zM6 6l8 6-8 6z" fill="white"/>',
+  };
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#16181d"/>${pathMap[kind] || pathMap.play}</svg>`;
+  return nativeImage.createFromDataURL('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+}
+
+function updateTaskbarPreview(win) {
+  if (!win || win.isDestroyed() || process.platform !== 'win32') return;
+  try {
+    win.setTitle(taskbarPreviewState.tooltip || APP_NAME);
+    if (typeof win.setThumbnailToolTip === 'function') {
+      win.setThumbnailToolTip(taskbarPreviewState.tooltip || APP_NAME);
+    }
+    if (typeof win.setThumbnailClip === 'function') {
+      win.setThumbnailClip(taskbarClipForPreview(win.getContentBounds()));
+    }
+    if (typeof win.setThumbarButtons === 'function') {
+      const hasTrack = !!taskbarPreviewState.hasTrack;
+      win.setThumbarButtons([
+        {
+          tooltip: '上一首',
+          icon: makeTaskbarSvgIcon('prev'),
+          flags: hasTrack ? [] : ['disabled'],
+          click: () => sendShellCommand('prev'),
+        },
+        {
+          tooltip: taskbarPreviewState.playing ? '暂停' : '播放',
+          icon: makeTaskbarSvgIcon(taskbarPreviewState.playing ? 'pause' : 'play'),
+          flags: hasTrack ? [] : ['disabled'],
+          click: () => sendShellCommand('togglePlay'),
+        },
+        {
+          tooltip: '下一首',
+          icon: makeTaskbarSvgIcon('next'),
+          flags: hasTrack ? [] : ['disabled'],
+          click: () => sendShellCommand('next'),
+        },
+      ]);
+    }
+  } catch (e) {
+    console.warn('Taskbar preview update failed:', e.message);
+  }
+}
+
 ipcMain.handle('desktop-window-minimize', (event) => {
   getSenderWindow(event)?.minimize();
 });
@@ -1468,6 +1571,12 @@ ipcMain.handle('desktop-window-close', (event) => {
     return;
   }
   win.close();
+});
+
+ipcMain.handle('mineradio-shell-state-update', (event, payload = {}) => {
+  taskbarPreviewState = normalizeTaskbarPreviewState(payload);
+  updateTaskbarPreview(getSenderWindow(event) || mainWindow);
+  return { ok: true, state: taskbarPreviewState };
 });
 
 ipcMain.handle('mineradio-hotkeys-configure-global', (_event, bindings) => {
@@ -1506,6 +1615,23 @@ ipcMain.handle('mineradio-import-json-file', async (event) => {
     return { ok: true, filePath, text };
   } catch (e) {
     return { ok: false, error: e.message || 'IMPORT_FAILED' };
+  }
+});
+
+ipcMain.handle('mineradio-chat-wallpaper-choose-image', async (event) => {
+  try {
+    return await chooseChatWallpaper(getSenderWindow(event));
+  } catch (e) {
+    return { ok: false, error: e.message || 'CHAT_WALLPAPER_IMAGE_FAILED' };
+  }
+});
+
+ipcMain.handle('mineradio-chat-wallpaper-reset-image', async () => {
+  try {
+    removeExistingChatWallpapers();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message || 'CHAT_WALLPAPER_RESET_FAILED' };
   }
 });
 
@@ -1770,6 +1896,7 @@ async function createWindow() {
 
   mainWindow.webContents.once('did-finish-load', () => {
     sendWindowState(mainWindow);
+    updateTaskbarPreview(mainWindow);
   });
 
   mainWindow.webContents.on('before-input-event', (event, input) => {
@@ -1794,6 +1921,7 @@ async function createWindow() {
   mainWindow.on('blur', () => sendWindowState(mainWindow));
   mainWindow.on('move', () => scheduleWindowStateSend(mainWindow));
   mainWindow.on('resize', () => scheduleWindowStateSend(mainWindow));
+  mainWindow.on('resize', () => updateTaskbarPreview(mainWindow));
   mainWindow.on('close', (event) => {
     if (isQuitting) return;
     event.preventDefault();

@@ -2,6 +2,20 @@
 
 本项目的重要变更记录在此文件中，格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [1.4.0] - 2026-07-10
+
+### 新增
+
+- 增加 Windows 任务栏音乐预览卡片与原生缩略图桥接。
+- 支持导入网易云、QQ 音乐、酷狗音乐和汽水音乐歌单链接。
+- 增加 Music Soul 聊天区域的独立壁纸设置。
+
+### 变更
+
+- 优化左侧歌单面板的行内展开、布局与播放管理体验。
+- 改进酷狗歌曲匹配、受限内容提示和跨来源识别。
+- 完善在线更新元数据、下载进度与安装器打开流程。
+
 ## [1.3.5] - 2026-07-05
 
 ### 新增
@@ -27,5 +41,6 @@
 - 完成面向开源发布的 Mineradio v1.3.3 主要功能更新。
 - 增加 electron-builder 与 Windows 安装程序配置。
 
-[1.3.5]: https://github.com/zzyxiangnian-star/Mineradio/compare/v1.3.3...HEAD
+[1.4.0]: https://github.com/zzyxiangnian-star/Mineradio/compare/v1.3.5...HEAD
+[1.3.5]: https://github.com/zzyxiangnian-star/Mineradio/compare/v1.3.3...v1.3.5
 [1.3.3]: https://github.com/zzyxiangnian-star/Mineradio/releases/tag/v1.3.3

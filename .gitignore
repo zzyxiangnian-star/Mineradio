@@ -21,6 +21,12 @@ dist/
 # IDE
 .vscode/
 .idea/
+.worktrees/
+.runtime-app/
+.runtime-check/
+.runtime-app.patched.asar
+native/**/build/
+native/**/bin/
 
 # OS
 Thumbs.db
