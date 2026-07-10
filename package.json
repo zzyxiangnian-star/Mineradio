@@ -1,0 +1,106 @@
+{
+  "name": "mineradio",
+  "productName": "Mineradio",
+  "version": "1.4.0",
+  "description": "沉浸式音乐播放器，融合天气电台、歌词舞台、粒子视觉和 3D 歌单架。",
+  "author": "Mineradio",
+  "license": "MIT",
+  "main": "src/desktop/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "rebuild:native": "electron-rebuild -f -w mineradio-taskbar-thumbnail",
+    "build": "electron-builder --win nsis --x64",
+    "build:portable": "electron-builder --win portable --x64"
+  },
+  "build": {
+    "appId": "com.mineradio.desktop",
+    "productName": "Mineradio",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "server.js",
+      "public/**/*",
+      "native/taskbar-thumbnail/**/*",
+      "!public/vendor/gsap.LICENCE",
+      "!**/node_modules/**/{test,tests,__tests__,example,examples}/**",
+      "!**/node_modules/**/*.{md,ts,map}",
+      "!**/.git/**"
+    ],
+    "extraResources": [],
+    "asarUnpack": [
+      "node_modules/mineradio-taskbar-thumbnail/build/Release/*.node"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "installerHeader": "build/installerHeader.bmp",
+      "installerSidebar": "build/installerSidebar.bmp",
+      "include": "build/installer.nsh",
+      "shortcutName": "Mineradio",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "perMachine": false,
+      "unicode": true,
+      "allowElevation": true,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "warningsAsErrors": false
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "build/icon.png",
+      "category": "Audio"
+    },
+    "afterPack": "./build/after-pack.js"
+  },
+  "mineradio": {
+    "update": {
+      "provider": "github",
+      "owner": "zzyxiangnian-star",
+      "repo": "Mineradio",
+      "preview": true,
+      "preferMirrors": true,
+      "mirrors": [
+        "https://gh.llkk.cc/",
+        "https://ghfast.top/",
+        "https://gh-proxy.com/"
+      ]
+    }
+  },
+  "dependencies": {
+    "gsap": "^3.15.0",
+    "mineradio-taskbar-thumbnail": "file:native/taskbar-thumbnail",
+    "mpg123-decoder": "^1.0.3",
+    "NeteaseCloudMusicApi": "^4.32.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.7.2",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "rcedit": "^5.0.2"
+  }
+}

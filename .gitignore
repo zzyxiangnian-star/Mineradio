@@ -1,0 +1,66 @@
+node_modules/
+dist/
+out/
+.env
+.env.*
+!.env.example
+.cookies
+.cookie
+.qq-cookie
+.kugou-cookie
+updates/
+*.log
+
+# Build output
+dist/
+*.exe
+*.msi
+*.dmg
+*.AppImage
+
+# IDE
+.vscode/
+.idea/
+.worktrees/
+.runtime-app/
+.runtime-check/
+.runtime-app.patched.asar
+native/**/build/
+native/**/bin/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Migration backups
+_ms-migration-backup-*/
+
+# AI config
+.ai-config.json
+.miss-ai-config.json
+
+# Beatmap cache
+MineradioCache/
+*.beatmap-cache
+
+# Electron installed application files (never source files)
+.mineradio-install-root
+/locales/
+/resources/
+/chrome_100_percent.pak
+/chrome_200_percent.pak
+/d3dcompiler_47.dll
+/ffmpeg.dll
+/icudtl.dat
+/index.html
+/libEGL.dll
+/libGLESv2.dll
+/LICENSE.electron.txt
+/LICENSES.chromium.html
+/resources.pak
+/snapshot_blob.bin
+/uninstallerIcon.ico
+/v8_context_snapshot.bin
+/vk_swiftshader.dll
+/vk_swiftshader_icd.json
+/vulkan-1.dll
