@@ -1,50 +1,116 @@
 # 参与贡献
 
-感谢你愿意改进 Mineradio。无论是问题反馈、文档修正还是功能提交，都欢迎通过 GitHub Issue 或 Pull Request 参与。
+感谢你愿意改进 Mineradio。无论是问题报告、文档修正、测试补充还是功能实现，都请先确认改动可以在本地复现和验证。
 
-## 提交 Issue
+## 开始之前
 
-提交前请先搜索已有 Issue，避免重复。问题报告建议包含：
+- 阅读 [README.md](./README.md)、[CHANGELOG.md](./CHANGELOG.md) 和 [SECURITY.md](./SECURITY.md)。
+- 搜索现有 Issue 和 Pull Request，避免重复工作。
+- 功能改动建议先通过 Issue 说明使用场景、预期行为和替代方案。
+- 安全漏洞不要提交公开 Issue，请按 [SECURITY.md](./SECURITY.md) 私下报告。
+- 本仓库是 [XxHuberrr/Mineradio](https://github.com/XxHuberrr/Mineradio.git) 的独立维护迭代；请尊重原项目、第三方依赖和音乐平台的许可证与服务条款。
 
-- Windows 版本、Node.js 版本与 Mineradio 版本；
-- 可复现步骤、预期结果与实际结果；
-- 必要的日志或截图（请先移除账号、Cookie、API Key 等敏感信息）；
-- 问题是否与特定音乐平台、登录状态或音频格式有关。
+## 开发环境
 
-## 本地开发
+- Windows 10/11 x64。
+- Node.js 18 或更高版本，推荐当前 LTS。
+- npm 9 或更高版本。
+- Git。
+- Visual Studio 2022 Build Tools：安装“使用 C++ 的桌面开发”和 Windows SDK，用于构建 `native/taskbar-thumbnail`。
 
-```bash
+克隆仓库并安装依赖：
+
+```powershell
 git clone https://github.com/zzyxiangnian-star/Mineradio.git
 cd Mineradio
-npm install
+npm install --ignore-scripts
+node node_modules/electron/install.js
+npm run rebuild:native
+```
+
+如果本机 C++ 工具链已完整配置，也可以直接使用 `npm install`，随后仍建议运行 `npm run rebuild:native`，确保原生模块与当前 Electron ABI 一致。
+
+## 本地开发与验证
+
+启动应用：
+
+```powershell
 npm start
 ```
 
-提交前请至少运行：
+运行自动化测试：
 
-```bash
-node test-ai-modules.js
-npm run build
+```powershell
+npm test
 ```
 
-## Pull Request
+需要验证安装包时运行：
 
-1. 从 `main` 创建语义清楚的功能分支。
-2. 保持改动聚焦，避免在同一个 PR 中混入无关格式化或重构。
-3. 在 PR 描述中说明动机、主要改动、验证方式和界面截图（如适用）。
-4. 不要提交 `.env`、Cookie、账号数据、API Key、缓存或构建产物。
-5. 新功能应同步更新 README 或相关文档；行为修改应补充可复现的验证步骤。
+```powershell
+npm run build
+npm run build:portable
+```
 
-## 第三方服务说明
+提交 PR 前至少完成 `npm test`。如果改动涉及任务栏缩略图、桌面窗口、安装器或平台登录，还应在 Windows 实机验证相关交互，并在 PR 中写明测试环境和结果。
 
-Mineradio 会接入第三方音乐与 AI 服务。贡献代码时请遵守相应平台的服务条款和内容许可，不要提交绕过付费、权限或访问控制的实现，也不要在测试数据中包含真实用户凭据。
+## 提交 Issue
 
-## 提交信息建议
+问题报告请包含：
 
-推荐使用简洁的 Conventional Commits 风格，例如：
+- Mineradio 版本、Windows 版本和安装/源码运行方式。
+- 清晰的复现步骤、预期结果和实际结果。
+- 是否稳定复现，以及涉及的音乐平台或歌曲来源。
+- 已脱敏的错误信息、控制台日志或截图。
+- 已尝试的排查方式。
+
+不要在 Issue 中粘贴 API Key、Cookie、账号凭据、用户数据路径中的私密内容或可直接利用的安全细节。音乐版权、地区、登录、会员和平台接口变更可能导致部分内容不可用，请先区分平台限制与应用缺陷。
+
+## 提交 Pull Request
+
+1. 从最新 `main` 创建范围清晰的分支。
+2. 一个 PR 只解决一个主题，避免混入无关格式化或重构。
+3. 行为改动应补充或更新 `test/` 下的自动化测试。
+4. UI 改动应提供截图或短视频，并说明窗口尺寸和系统缩放比例。
+5. 依赖或构建改动应解释必要性、兼容性和产物变化。
+6. 文档、版本号和用户提示应与实际行为一致。
+7. 提交前运行 `npm test` 和 `git diff --check`。
+
+PR 描述至少应回答：
+
+- 改了什么，为什么需要改。
+- 对用户或开发者有什么影响。
+- 如何验证，验证结果是什么。
+- 是否存在已知限制、平台差异或后续工作。
+
+## 提交信息
+
+建议使用简洁、可检索的提交前缀：
 
 ```text
-feat: add playlist interaction
-fix: restore desktop lyrics position
-docs: clarify AI configuration
+feat: add playlist import flow
+fix: handle unavailable kugou tracks
+docs: clarify native build requirements
+test: cover taskbar preview state
+chore: update build metadata
 ```
+
+使用祈使语气描述一个完整改动，不要用“update files”“fix stuff”等无法说明范围的信息。
+
+## 敏感信息与第三方服务
+
+以下内容不得提交：
+
+- `.env` 中的真实 API Key、令牌或私有服务地址。
+- `.cookie`、`.qq-cookie`、`.kugou-cookie` 和其他登录凭据。
+- 用户配置、播放历史、缓存、日志、更新下载和本机绝对路径。
+- `node_modules/`、`dist/`、原生模块编译目录、已安装 Electron 运行库和可执行程序。
+- 无权再分发的音乐、封面、字体、图片或其他媒体。
+
+第三方音乐服务可能随时调整接口、登录、地区、会员和版权策略。贡献者应提供明确的失败处理，不应加入绕过访问控制、付费权益或数字版权保护的逻辑。
+
+## 行为准则
+
+- 讨论问题本身，尊重不同经验和观点。
+- 提供可验证的技术证据，避免人身攻击或贬低式表达。
+- 接受维护者对范围、安全、版权和长期维护成本的判断。
+- 发现敏感信息时停止传播，并尽快通知维护者处理。
